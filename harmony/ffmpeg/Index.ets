@@ -1,7 +1,10 @@
 import native from 'libhmosffmpeg.so';
 
 export interface BuildInfo { version: string; license: string; configuration: string; hardwareBackend: string; }
-export interface Capabilities { encoders: string[]; filters: string[]; }
+export interface Capabilities {
+  encoders: string[]; decoders: string[]; filters: string[];
+  muxers: string[]; demuxers: string[]; inputProtocols: string[]; outputProtocols: string[];
+}
 export interface StreamInfo { index: number; codec: string; type: string; width: number; height: number; sampleRate: number; channels: number; }
 export interface MediaInfo { format: string; durationUs: number; streams: StreamInfo[]; }
 export interface TranscodeOptions {

@@ -17,10 +17,16 @@ export OHOS_WRAPPER_SDK="$SDK"
 export OHOS_WRAPPER_TARGET=aarch64-linux-ohos12.0.0
 cat > "$BUILD/cc-ohos" <<'SH'
 #!/usr/bin/env bash
+if command -v ccache >/dev/null 2>&1; then
+  exec ccache "$OHOS_WRAPPER_SDK/llvm/bin/clang" --target="$OHOS_WRAPPER_TARGET" --sysroot="$OHOS_WRAPPER_SDK/sysroot" "$@"
+fi
 exec "$OHOS_WRAPPER_SDK/llvm/bin/clang" --target="$OHOS_WRAPPER_TARGET" --sysroot="$OHOS_WRAPPER_SDK/sysroot" "$@"
 SH
 cat > "$BUILD/cxx-ohos" <<'SH'
 #!/usr/bin/env bash
+if command -v ccache >/dev/null 2>&1; then
+  exec ccache "$OHOS_WRAPPER_SDK/llvm/bin/clang++" --target="$OHOS_WRAPPER_TARGET" --sysroot="$OHOS_WRAPPER_SDK/sysroot" "$@"
+fi
 exec "$OHOS_WRAPPER_SDK/llvm/bin/clang++" --target="$OHOS_WRAPPER_TARGET" --sysroot="$OHOS_WRAPPER_SDK/sysroot" "$@"
 SH
 chmod +x "$BUILD/cc-ohos" "$BUILD/cxx-ohos"

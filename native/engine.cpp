@@ -183,6 +183,18 @@ std::string capabilities() {
     while ((c = av_codec_iterate(&it))) if(av_codec_is_encoder(c)) {
         if(!first) result += ','; first = false; result += quote(c->name);
     }
+    result += "],\"decoders\":["; first = true; it = nullptr;
+    while ((c = av_codec_iterate(&it))) if(av_codec_is_decoder(c)) {
+        if(!first) result += ','; first = false; result += quote(c->name);
+    }
+    result += "],\"muxers\":["; first = true; it = nullptr; const AVOutputFormat* mux;
+    while((mux = av_muxer_iterate(&it))) { if(!first) result += ','; first = false; result += quote(mux->name); }
+    result += "],\"demuxers\":["; first = true; it = nullptr; const AVInputFormat* demux;
+    while((demux = av_demuxer_iterate(&it))) { if(!first) result += ','; first = false; result += quote(demux->name); }
+    result += "],\"inputProtocols\":["; first = true; it = nullptr; const char* protocol;
+    while((protocol = avio_enum_protocols(&it, 0))) { if(!first) result += ','; first = false; result += quote(protocol); }
+    result += "],\"outputProtocols\":["; first = true; it = nullptr;
+    while((protocol = avio_enum_protocols(&it, 1))) { if(!first) result += ','; first = false; result += quote(protocol); }
     result += "],\"filters\":["; first = true; it = nullptr; const AVFilter* f;
     while((f = av_filter_iterate(&it))) { if(!first) result += ','; first = false; result += quote(f->name); }
     return result + "]}";

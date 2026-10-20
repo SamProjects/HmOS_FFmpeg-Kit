@@ -22,7 +22,7 @@ ffmpeg -v error -f lavfi -i testsrc2=size=192x128:rate=24 -f lavfi -i sine=frequ
   -t 2 -c:v mpeg4 -c:a aac work/native-test/media/input.mp4
 g++ -std=c++17 -g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer \
   -I"$OUT/include" -Inative native/engine.cpp tests/media_pipeline.cpp \
-  -L"$OUT/lib" -lavformat -lavcodec -lavfilter -lavutil -o work/native-test/pipeline-test
+  -L"$OUT/lib" -Wl,-rpath-link,"$OUT/lib" -lavformat -lavcodec -lavfilter -lswscale -lswresample -lavutil -o work/native-test/pipeline-test
 export LD_LIBRARY_PATH="$OUT/lib"
 ASAN_OPTIONS=detect_leaks=1 ./work/native-test/pipeline-test "$ROOT/work/native-test/media"
 unset LD_LIBRARY_PATH

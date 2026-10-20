@@ -11,8 +11,12 @@ for name, lock in SOURCES.items():
     source = WORK / 'src' / name
     evidence = WORK / 'integrity' / (name + '.json')
     if args.verify_only:
-        if snapshot(source) != json.loads(evidence.read_text()):
-            raise SystemExit('Upstream source changed: ' + name)
+        current = snapshot(source)
+        original = json.loads(evidence.read_text())
+        if current != original:
+            changed = [p for p in sorted(current.keys() | original.keys()) if current.get(p) != original.get(p)]
+            write_json(WORK / 'integrity' / (name + '-diff.json'), changed)
+            raise SystemExit('Upstream source changed: ' + name + ': ' + ', '.join(changed[:20]))
         continue
     archive = download(lock['url'], WORK / 'downloads' / lock['url'].split('/')[-1], lock['sha256'])
     if name == 'ffmpeg':

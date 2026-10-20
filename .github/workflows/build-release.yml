@@ -39,14 +39,28 @@ jobs:
       fail-fast: false
       matrix:
         profile: [core, extended]
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/work/ccache
+      CCACHE_MAXSIZE: 2G
+      CCACHE_COMPILERCHECK: content
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build pkg-config gnupg libgl1 unzip
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build pkg-config gnupg libgl1 unzip ccache openjdk-17-jre-headless
+      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        id: ccache
+        with:
+          path: work/ccache
+          key: hmos-ccache-${{ matrix.profile }}-${{ hashFiles('config/**', 'scripts/build-ohos.sh', 'scripts/build-deps.sh') }}
       - name: Prepare pinned HarmonyOS SDK
         run: python3 scripts/setup-sdk.py
       - name: Cross compile FFmpeg and NAPI bridge
         run: bash scripts/build-ohos.sh "${{ matrix.profile }}"
+      - uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
+        if: always() && github.event_name != 'pull_request' && steps.ccache.outputs.cache-hit != 'true'
+        with:
+          path: work/ccache
+          key: ${{ steps.ccache.outputs.cache-primary-key }}
       - name: Build HAR and a consumer HAP
         run: python3 scripts/build-har.py "${{ matrix.profile }}"
       - name: Package SDK, symbols and corresponding sources
@@ -94,6 +108,16 @@ jobs:
           tag="v${version}-ci.${GITHUB_RUN_NUMBER}"
           if [[ "$REF_TYPE" == tag ]]; then tag="$REF_NAME"; fi
           (cd release-dist; sha256sum *.har *.tar.gz *-manifest.json > SHA256SUMS)
-          gh release create "$tag" release-dist/* --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" --prerelease --title "HmOS FFmpeg $tag" \
-            --notes-file docs/RELEASE-NOTES.md
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            draft=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
+            target=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq .targetCommitish)
+            [[ "$draft" == true && "$target" == "$GITHUB_SHA" ]] || {
+              echo 'Refusing to overwrite an existing published or unrelated release'; exit 1;
+            }
+          else
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --draft \
+              --target "$GITHUB_SHA" --prerelease --title "HmOS FFmpeg $tag" \
+              --notes-file docs/RELEASE-NOTES.md
+          fi
+          gh release upload "$tag" release-dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          gh release edit "$tag" --draft=false --prerelease --repo "$GITHUB_REPOSITORY"

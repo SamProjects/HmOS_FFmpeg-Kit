@@ -7,3 +7,8 @@ dist/
 local.properties
 __pycache__/
 *.pyc
+*.har
+*.hap
+**/oh-package-lock.json5
+**/BuildProfile.ets
+**/.ohpm/

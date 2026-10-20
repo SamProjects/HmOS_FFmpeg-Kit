@@ -1,1 +1,7 @@
-{"name":"entry","version":"0.1.0","dependencies":{"@samprojects/hmos-ffmpeg":"file:./libs/hmos-ffmpeg.har"}}
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "dependencies": {
+    "@samprojects/hmos-ffmpeg": "file:./libs/hmos-ffmpeg.har"
+  }
+}

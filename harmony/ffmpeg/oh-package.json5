@@ -1,9 +1,10 @@
 {
-  "name":"@samprojects/hmos-ffmpeg",
-  "version":"0.1.0",
-  "description":"Official zero-patch FFmpeg shared libraries for HarmonyOS arm64-v8a",
-  "main":"Index.ets",
-  "types":"Index.ets",
-  "license":"MIT AND LGPL-3.0-or-later",
-  "dependencies":{"libhmosffmpeg.so":"file:./src/main/cpp/types/libhmosffmpeg"}
+  "name": "@samprojects/hmos-ffmpeg",
+  "version": "1.0.0",
+  "description": "Official zero-patch FFmpeg shared libraries for HarmonyOS arm64-v8a",
+  "main": "Index.ets",
+  "license": "MIT AND LGPL-3.0-or-later",
+  "dependencies": {
+    "libhmosffmpeg.so": "file:./src/main/cpp/types/libhmosffmpeg"
+  }
 }

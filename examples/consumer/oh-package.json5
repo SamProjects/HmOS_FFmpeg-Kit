@@ -1,1 +1,7 @@
-{"modelVersion":"6.0.0","name":"hmos-ffmpeg-consumer","version":"0.1.0","dependencies":{},"devDependencies":{}}
+{
+  "modelVersion": "6.0.0",
+  "name": "hmos-ffmpeg-consumer",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {}
+}

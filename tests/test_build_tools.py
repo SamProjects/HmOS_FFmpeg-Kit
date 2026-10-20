@@ -51,7 +51,7 @@ class BuildToolsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             gate.BUILD = Path(d)
             f = gate.BUILD / 'ffmpeg'; f.mkdir()
-            conf = '#define CONFIG_GPL 0\n#define CONFIG_NONFREE 0\n#define CONFIG_VERSION3 1\n#define FFMPEG_LICENSE "GNU Lesser General Public License v3 or later"\n'
+            conf = '#define CONFIG_GPL 0\n#define CONFIG_NONFREE 0\n#define CONFIG_VERSION3 1\n#define FFMPEG_LICENSE "LGPL version 3 or later"\n'
             (f / 'configure-args.txt').write_text('--disable-gpl\n--disable-nonfree\n--enable-version3\n')
             (f / 'config.h').write_text(conf)
             gate.license_gate()
@@ -59,6 +59,28 @@ class BuildToolsTests(unittest.TestCase):
             with self.assertRaises(ValueError): gate.license_gate()
             (f / 'config.h').write_text(conf.replace('CONFIG_NONFREE 0', 'CONFIG_NONFREE 1'))
             with self.assertRaises(ValueError): gate.license_gate()
+
+    def test_release_rejects_asset_tampering(self):
+        spec = importlib.util.spec_from_file_location('release_gate', ROOT / 'scripts/check-release.py')
+        gate = importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)
+        with tempfile.TemporaryDirectory() as d:
+            directory = Path(d)
+            for profile in ['core','extended']:
+                base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-arm64-v8a'
+                (directory / (base + '.har')).write_bytes(b'checksum-test-fixture')
+                (directory / (base + '-sources.tar.gz')).write_bytes(b'source-test-fixture')
+                manifest = {'profile':profile,'project':PROJECT,'commit':__import__('os').environ.get('GITHUB_SHA','local'),
+                            'validation':dict(sourceIntegrity=True,licenseConfig=True,elfClosure=True)}
+                (directory / (base + '-manifest.json')).write_text(json.dumps(manifest))
+                with tarfile.open(directory / (base + '-sdk.tar.gz'), 'w:gz') as t:
+                    info = tarfile.TarInfo(base + '/consumer-validation.json')
+                    data = b'{"consumerHapBuilt":true}'
+                    info.size = len(data); t.addfile(info, io.BytesIO(data))
+                for path in list(directory.glob(base + '*')):
+                    (directory / (path.name + '.sha256')).write_text(digest(path) + '  ' + path.name + '\n')
+            gate.validate(directory)
+            next(directory.glob('*.har')).write_bytes(b'modified')
+            with self.assertRaises(ValueError): gate.validate(directory)
 
 
 if __name__ == '__main__': unittest.main()

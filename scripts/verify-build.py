@@ -39,7 +39,8 @@ def license_gate():
     for name, value in [('GPL', 0), ('NONFREE', 0), ('VERSION3', 1)]:
         if not re.search(rf'^#define CONFIG_{name} {value}$', config, re.M):
             raise ValueError('License configuration mismatch: ' + name)
-    if 'GNU Lesser General Public License' not in config:
+    match = re.search(r'^#define FFMPEG_LICENSE "([^"]+)"$', config, re.M)
+    if not match or match[1] not in {'LGPL version 3 or later', 'GNU Lesser General Public License v3 or later'}:
         raise ValueError('Not an LGPL build')
     args = (BUILD / 'ffmpeg/configure-args.txt').read_text().splitlines()
     if set(args) & {'--enable-gpl', '--enable-nonfree'}:

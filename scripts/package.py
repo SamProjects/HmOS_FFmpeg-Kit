@@ -48,9 +48,15 @@ for p in [sdk / 'NOTICE.txt', sdk / 'llvm/NOTICE.txt', sdk / 'llvm/LICENSE.TXT']
 shutil.copytree(licenses, har / 'licenses')
 shutil.copy2(ROOT / 'LICENSE', licenses / 'project-MIT.txt')
 shutil.copy2(ROOT / 'LICENSE', har / 'licenses/project-MIT.txt')
+shutil.copytree(licenses, har / 'src/main/resources/rawfile/hmos_ffmpeg_licenses')
 shutil.copy2(ROOT / 'docs/INTEGRATION.zh-CN.md', har / 'README.md')
 for file in ['config.h','config_components.h','configure-args.txt','configure.log']:
     shutil.copy2(build / 'ffmpeg' / file, package / file)
+import re
+components = (build / 'ffmpeg/config_components.h').read_text()
+write_json(package / 'compiled-capabilities.json', {
+    'method':'configure component inventory; runtime enumeration is available through FFmpeg.getCapabilities()',
+    'enabled': re.findall(r'^#define CONFIG_(\w+) 1$', components, re.M)})
 shutil.copy2(build / 'license-gate.json', package / 'license-gate.json')
 shutil.copy2(WORK / 'sdk.json', package / 'sdk-build.json')
 spec = importlib.util.spec_from_file_location('verify_build', ROOT / 'scripts/verify-build.py')

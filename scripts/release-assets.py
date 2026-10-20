@@ -25,6 +25,8 @@ with tarfile.open(assets / (base + '-sources.tar.gz'), 'w:gz') as t:
         if sig.exists(): t.add(sig, arcname='sources/' + sig.name)
     for dirname in ['scripts','config','native','harmony','docs','examples']:
         t.add(ROOT / dirname, arcname='recipe/' + dirname)
+    for filename in ['LICENSE', 'README.md']:
+        t.add(ROOT / filename, arcname='recipe/' + filename)
     t.add(WORK / 'signature.txt', arcname='evidence/signature.txt')
     t.add(WORK / 'integrity', arcname='evidence/integrity')
 shutil.copy2(package / 'manifest.json', assets / (base + '-manifest.json'))

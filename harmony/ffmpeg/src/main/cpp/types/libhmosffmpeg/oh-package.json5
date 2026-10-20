@@ -1,1 +1,5 @@
-{"name":"libhmosffmpeg.so","version":"0.1.0","types":"./Index.d.ts"}
+{
+  "name": "libhmosffmpeg.so",
+  "version": "1.0.0",
+  "types": "./Index.d.ts"
+}
