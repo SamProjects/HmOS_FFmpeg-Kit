@@ -113,7 +113,7 @@ jobs:
             }
           else
             gh release create "$tag" --repo "$GITHUB_REPOSITORY" --draft \
-              --target "$GITHUB_SHA" --prerelease --title "HmOS FFmpeg $tag" \
+              --target "$GITHUB_SHA" --prerelease --title "鸿蒙 FFmpeg $tag（预发布版）" \
               --notes-file docs/RELEASE-NOTES.md
           fi
           gh release upload "$tag" dist/assets/* --clobber --repo "$GITHUB_REPOSITORY"
