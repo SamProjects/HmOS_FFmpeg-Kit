@@ -55,17 +55,42 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build nasm pkg-config gnupg libgl1 unzip openjdk-17-jre-headless
       - name: Prepare pinned HarmonyOS SDK
         run: python3 scripts/setup-sdk.py
-      - name: Build all ABIs and validate single-ABI and universal HAR consumers
+      - name: Build core ARM64 SDK and HAR
+        env:
+          HMOS_ABI: arm64-v8a
         run: |
-          for profile in core extended; do
-            for abi in arm64-v8a x86_64; do
-              export HMOS_ABI="$abi"
-              bash scripts/build-ohos.sh "$profile"
-              python3 scripts/build-har.py "$profile"
-              python3 scripts/release-assets.py "$profile"
-            done
-            python3 scripts/build-har.py "$profile" --universal
-          done
+          bash scripts/build-ohos.sh core
+          python3 scripts/build-har.py core
+          python3 scripts/release-assets.py core
+          python3 scripts/cleanup-profile.py core
+      - name: Build core x86_64 SDK and HAR
+        env:
+          HMOS_ABI: x86_64
+        run: |
+          bash scripts/build-ohos.sh core
+          python3 scripts/build-har.py core
+          python3 scripts/release-assets.py core
+          python3 scripts/cleanup-profile.py core
+      - name: Build core universal HAR and validate three consumer ABI selections
+        run: python3 scripts/build-har.py core --universal
+      - name: Build extended ARM64 SDK and HAR
+        env:
+          HMOS_ABI: arm64-v8a
+        run: |
+          bash scripts/build-ohos.sh extended
+          python3 scripts/build-har.py extended
+          python3 scripts/release-assets.py extended
+          python3 scripts/cleanup-profile.py extended
+      - name: Build extended x86_64 SDK and HAR
+        env:
+          HMOS_ABI: x86_64
+        run: |
+          bash scripts/build-ohos.sh extended
+          python3 scripts/build-har.py extended
+          python3 scripts/release-assets.py extended
+          python3 scripts/cleanup-profile.py extended
+      - name: Build extended universal HAR and validate three consumer ABI selections
+        run: python3 scripts/build-har.py extended --universal
       - name: Verify both release packages
         run: python3 scripts/check-release.py dist/assets
       - name: Publish directly from this runner to Release

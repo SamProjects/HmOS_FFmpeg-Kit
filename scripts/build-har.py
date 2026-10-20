@@ -19,10 +19,8 @@ if universal:
     shutil.copytree(DIST / profile / 'licenses', module / 'licenses')
     shutil.copytree(DIST / profile / 'licenses', module / 'src/main/resources/rawfile/hmos_ffmpeg_licenses')
     shutil.copy2(ROOT / 'docs/INTEGRATION.zh-CN.md', module / 'README.md')
-har_profile_path = directory / 'ffmpeg/build-profile.json5'
-har_profile = json.loads(har_profile_path.read_text())
-har_profile['buildOption']['externalNativeOptions'] = {'abiFilters':abis}
-write_json(har_profile_path, har_profile)
+# These are prebuilt libraries. Setting externalNativeOptions on a HAR
+# asks Hvigor to run CMake; all required ABI directories are already staged.
 run(['ohpm', 'install', '--all'], cwd=directory)
 run(['hvigorw', '--mode', 'module', '-p', 'product=default', '-p', 'module=ffmpeg@default',
      '-p', 'buildMode=release', 'assembleHar', '--no-daemon'], cwd=directory)
