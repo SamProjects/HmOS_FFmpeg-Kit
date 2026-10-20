@@ -1,0 +1,45 @@
+name: 校验并恢复已编译的发布
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/recover-release.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: recover-release-v1.0.1-ci.10
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: v1.0.1-ci.10
+      SOURCE_SHA: c5a555eaed241db99ceb85abf4d9581124957f85
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: c5a555eaed241db99ceb85abf4d9581124957f85
+      - name: 下载草稿附件并验证原始源码和所有校验和
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          git fetch --no-tags origin "refs/tags/$RELEASE_TAG"
+          test "$(git rev-parse 'FETCH_HEAD^{commit}')" = "$SOURCE_SHA"
+          gh api "repos/$GITHUB_REPOSITORY/releases/418520301" > /tmp/release.json
+          jq -e --arg tag "$RELEASE_TAG" '.tag_name == $tag and .draft == true' /tmp/release.json
+          mkdir -p dist/assets
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir dist/assets
+          (cd dist/assets && sha256sum --check SHA256SUMS)
+          GITHUB_SHA="$SOURCE_SHA" python3 scripts/check-release.py dist/assets
+          python3 scripts/check-upload.py dist/assets /tmp/release.json
+      - name: 发布校验通过的预发布版
+        run: |
+          set -euo pipefail
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/418520301" \
+            -F draft=false -F prerelease=true \
+            -f name="鸿蒙 FFmpeg $RELEASE_TAG（预发布版）" \
+            -f body="$(cat docs/RELEASE-NOTES.md)" > /tmp/published.json
+          jq -e --arg tag "$RELEASE_TAG" '.tag_name == $tag and .draft == false and (.assets | length) == 41' /tmp/published.json
+          jq -r .html_url /tmp/published.json
