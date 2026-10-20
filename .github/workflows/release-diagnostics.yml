@@ -18,5 +18,5 @@ jobs:
           set -euo pipefail
           log="$RUNNER_TEMP/release-job.log"
           trap 'rm -f "$log"' EXIT
-          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/118661707320/logs" > "$log"
-          tail -n 150 "$log"
+          gh api --allow-escape-sequences "repos/$GITHUB_REPOSITORY/actions/jobs/118661707320/logs" > "$log"
+          tail -n 150 "$log" | sed -r 's/\x1B\[[0-9;]*[mK]//g'
