@@ -55,6 +55,8 @@ python3 scripts/release-assets.py extended
 
 CI 默认下载 config/sdk.lock.json 中固定 SHA-256 的 Huawei CLI 社区镜像，不把 SDK 重新发布到本项目；生产组织可以自行提供已授权、核验过的 SDK，用 OHOS_NATIVE/HARMONY_TOOLS 指向本地安装。所有媒体依赖来自锁定官方发布源。不要把社区 SDK 镜像误称为官方分发站点。
 
+需要发布时，CI 在长时间编译之前检查发布权限、固定源码标签并创建中文草稿；全部构建验证后核对远端附件名称、大小和 SHA-256，再公开为预发布版。构建期间 main 发生变化也不会把标签悄悄改指向新提交。上传失败会重试并保留草稿，不公开不完整版本。完整编译命令保存到 SDK 的日志文件，Actions 控制台只输出阶段进度及失败摘要。
+
 首次重跑请使用全新 workspace；脚本拒绝复用已有构建目录，避免污染。Windows 可以通过 DevEco 直接消费 HAR；完整 FFmpeg 构建入口当前是 Linux/Actions，未声称 Windows PowerShell 本地交叉构建通过，也不自动安装 WSL。
 
 ## 验证和许可证

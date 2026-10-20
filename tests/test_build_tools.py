@@ -113,5 +113,16 @@ class BuildToolsTests(unittest.TestCase):
             with zipfile.ZipFile(hap, 'w') as z: z.writestr('libs/arm64-v8a/libexample.so', b'altered')
             with self.assertRaises(ValueError): validate_hap(hap, runtime, ['arm64-v8a'])
 
+    def test_remote_upload_gate_rejects_mismatched_asset(self):
+        spec = importlib.util.spec_from_file_location('upload_gate', ROOT / 'scripts/check-upload.py')
+        gate = importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / 'file.har'; p.write_bytes(b'validated-library')
+            release = {'draft':True, 'tag_name':__import__('os').environ.get('RELEASE_TAG','local'),
+                       'assets':[{'name':p.name,'state':'uploaded','size':p.stat().st_size,'digest':'sha256:'+digest(p)}]}
+            gate.validate(d, release)
+            release['assets'][0]['digest'] = 'sha256:' + '0'*64
+            with self.assertRaises(ValueError): gate.validate(d, release)
+
 
 if __name__ == '__main__': unittest.main()

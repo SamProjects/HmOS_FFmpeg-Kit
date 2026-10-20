@@ -41,7 +41,10 @@ unset PKG_CONFIG_SYSROOT_DIR
 mkdir -p "$PKG_CONFIG_LIBDIR"
 extra=()
 if [[ "$PROFILE" == extended ]]; then
-  bash scripts/build-deps.sh "$BUILD/deps" "$PREFIX"
+  if ! bash scripts/build-deps.sh "$BUILD/deps" "$PREFIX" > "$BUILD/deps.log" 2>&1; then
+    tail -n 120 "$BUILD/deps.log"; exit 1
+  fi
+  echo "第三方依赖编译完成：$PROFILE $ABI（完整日志随 SDK 归档）"
   extra+=(--enable-libopus --enable-libvpx --enable-libmp3lame --enable-zlib --enable-mbedtls)
 fi
 mkdir "$BUILD/ffmpeg"
@@ -60,15 +63,23 @@ args=("--prefix=$PREFIX" --target-os=linux "--arch=$ARCH" "--cpu=$CPU"
   "--extra-ldflags=-fuse-ld=lld -L$PREFIX/lib -Wl,-z,relro,-z,now,--build-id=sha1"
   --extra-ldexeflags=-pie "${extra[@]}")
 printf '%s\n' "${args[@]}" > configure-args.txt
-bash "$ROOT/work/src/ffmpeg/configure" "${args[@]}" 2>&1 | tee configure.log
+if ! bash "$ROOT/work/src/ffmpeg/configure" "${args[@]}" > configure.log 2>&1; then
+  tail -n 120 configure.log; exit 1
+fi
 # GNU make command-line overrides only: no source/config/ELF patching.
 # Distinct versioned basename ending .so works with HAR native packaging.
 names=('SLIBNAME_WITH_MAJOR=$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
        'SLIBNAME_WITH_VERSION=$(SLIBNAME_WITH_MAJOR)'
        'SLIB_INSTALL_NAME=$(SLIBNAME_WITH_MAJOR)'
        'SLIB_INSTALL_LINKS=$(SLIBNAME)')
-make -j"${JOBS:-4}" V=1 "${names[@]}" 2>&1 | tee build.log
-make install "${names[@]}" 2>&1 | tee install.log
+echo "开始 FFmpeg 编译：$PROFILE $ABI（完整命令写入 SDK 中的 build.log）"
+if ! make -j"${JOBS:-4}" V=1 "${names[@]}" > build.log 2>&1; then
+  tail -n 120 build.log; exit 1
+fi
+if ! make install "${names[@]}" > install.log 2>&1; then
+  tail -n 120 install.log; exit 1
+fi
+echo "FFmpeg 编译与安装完成：$PROFILE $ABI"
 cd "$ROOT"
 python3 scripts/fetch-sources.py --verify-only
 python3 scripts/verify-build.py "$PROFILE"

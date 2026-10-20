@@ -65,6 +65,7 @@ shutil.copytree(licenses, har / 'src/main/resources/rawfile/hmos_ffmpeg_licenses
 shutil.copy2(ROOT / 'docs/INTEGRATION.zh-CN.md', har / 'README.md')
 for file in ['config.h','config_components.h','configure-args.txt','configure.log','build.log','install.log']:
     shutil.copy2(build / 'ffmpeg' / file, package / file)
+if (build / 'deps.log').is_file(): shutil.copy2(build / 'deps.log', package / 'dependencies-build.log')
 import re
 components = (build / 'ffmpeg/config_components.h').read_text()
 write_json(package / 'compiled-capabilities.json', {

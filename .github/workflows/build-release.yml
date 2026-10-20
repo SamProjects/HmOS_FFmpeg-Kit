@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - run: python3 -m unittest discover -s tests -v
-      - run: bash -n scripts/build-ohos.sh scripts/build-deps.sh scripts/test-native.sh scripts/cleanup-actions-storage.sh scripts/install-ci-deps.sh
+      - run: bash -n scripts/build-ohos.sh scripts/build-deps.sh scripts/test-native.sh scripts/cleanup-actions-storage.sh scripts/install-ci-deps.sh scripts/prepare-release.sh scripts/publish-release.sh
   media-test:
     needs: verify
     runs-on: ubuntu-24.04
@@ -51,6 +51,13 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: 提前检查发布权限并固定源码标签
+        if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.publish)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: bash scripts/prepare-release.sh
       - name: Install build dependencies
         run: bash scripts/install-ci-deps.sh build
       - name: Prepare pinned HarmonyOS SDK
@@ -97,27 +104,7 @@ jobs:
         if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.publish)
         env:
           GH_TOKEN: ${{ github.token }}
-          REF_TYPE: ${{ github.ref_type }}
-          REF_NAME: ${{ github.ref_name }}
-        run: |
-          set -euo pipefail
-          version=$(python3 -c 'import json; print(json.load(open("config/project.json"))["version"])')
-          tag="v${version}-ci.${GITHUB_RUN_NUMBER}"
-          if [[ "$REF_TYPE" == tag ]]; then tag="$REF_NAME"; fi
-          (cd dist/assets; sha256sum *.har *.tar.gz *.json > SHA256SUMS)
-          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            draft=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
-            target=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq .targetCommitish)
-            [[ "$draft" == true && "$target" == "$GITHUB_SHA" ]] || {
-              echo 'Refusing to overwrite an existing published or unrelated release'; exit 1;
-            }
-          else
-            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --draft \
-              --target "$GITHUB_SHA" --prerelease --title "鸿蒙 FFmpeg $tag（预发布版）" \
-              --notes-file docs/RELEASE-NOTES.md
-          fi
-          gh release upload "$tag" dist/assets/* --clobber --repo "$GITHUB_REPOSITORY"
-          gh release edit "$tag" --draft=false --prerelease --repo "$GITHUB_REPOSITORY"
+        run: bash scripts/publish-release.sh
       - name: Remove temporary files on the runner
         if: always()
         run: python3 scripts/cleanup-runner.py
