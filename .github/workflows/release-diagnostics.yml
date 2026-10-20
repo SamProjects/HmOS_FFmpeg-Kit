@@ -1,0 +1,22 @@
+name: 读取发布失败摘要
+on:
+  workflow_run:
+    workflows: ['HarmonyOS HAR build and release']
+    types: [completed]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  release-log:
+    if: github.event.workflow_run.id == 39432186294 && github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: 仅输出发布阶段日志，不创建 Artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          log="$RUNNER_TEMP/release-job.log"
+          trap 'rm -f "$log"' EXIT
+          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/118661707320/logs" > "$log"
+          tail -n 150 "$log"
