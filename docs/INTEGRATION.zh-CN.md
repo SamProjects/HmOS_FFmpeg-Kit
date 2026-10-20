@@ -44,6 +44,7 @@ SDK 包的 bin/ffmpeg 和 bin/ffprobe 是 OHOS ELF。开发 shell 可以验证�
 ```cmake
 find_package(FFmpeg CONFIG REQUIRED PATHS "<解压目录>/sdk" NO_DEFAULT_PATH)
 target_link_libraries(your_native_target PRIVATE FFmpeg::FFmpeg)
+set_target_properties(your_native_target PROPERTIES SKIP_BUILD_RPATH TRUE)
 # 也可按需选择 FFmpeg::avformat / avcodec / avfilter / avutil 等目标。
 ```
 
