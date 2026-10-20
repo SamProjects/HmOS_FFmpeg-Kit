@@ -26,6 +26,18 @@ for lib in runtime.glob('*.so'):
     run([sdk / 'llvm/bin/llvm-strip', '--strip-debug', lib])
 shutil.copytree(prefix / 'include', package / 'sdk/include')
 shutil.copytree(prefix / 'lib', package / 'sdk/lib', symlinks=True)
+cmake_config = ['set(FFmpeg_VERSION "' + PROJECT['ffmpeg'] + '")']
+for component in ['avutil','swresample','swscale','avcodec','avformat','avfilter','avdevice']:
+    lib = list((prefix / 'lib').glob('lib' + component + '-*.so'))
+    if len(lib) != 1: raise ValueError('Ambiguous imported library: ' + component)
+    cmake_config += [f'if(NOT TARGET FFmpeg::{component})',
+        f'  add_library(FFmpeg::{component} SHARED IMPORTED)',
+        f'  set_target_properties(FFmpeg::{component} PROPERTIES',
+        f'    IMPORTED_LOCATION "${{CMAKE_CURRENT_LIST_DIR}}/lib/{lib[0].name}"',
+        '    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include")', 'endif()']
+cmake_config += ['if(NOT TARGET FFmpeg::FFmpeg)', '  add_library(FFmpeg::FFmpeg INTERFACE IMPORTED)',
+    '  set_target_properties(FFmpeg::FFmpeg PROPERTIES INTERFACE_LINK_LIBRARIES "FFmpeg::avdevice;FFmpeg::avfilter;FFmpeg::avformat;FFmpeg::avcodec;FFmpeg::swscale;FFmpeg::swresample;FFmpeg::avutil")', 'endif()']
+(package / 'sdk/FFmpegConfig.cmake').write_text('\n'.join(cmake_config) + '\n')
 shutil.copytree(prefix / 'bin', package / 'bin')
 shutil.copytree(ROOT / 'harmony', WORK / 'har' / profile)
 har = WORK / 'har' / profile / 'ffmpeg'
@@ -50,7 +62,7 @@ shutil.copy2(ROOT / 'LICENSE', licenses / 'project-MIT.txt')
 shutil.copy2(ROOT / 'LICENSE', har / 'licenses/project-MIT.txt')
 shutil.copytree(licenses, har / 'src/main/resources/rawfile/hmos_ffmpeg_licenses')
 shutil.copy2(ROOT / 'docs/INTEGRATION.zh-CN.md', har / 'README.md')
-for file in ['config.h','config_components.h','configure-args.txt','configure.log']:
+for file in ['config.h','config_components.h','configure-args.txt','configure.log','build.log','install.log']:
     shutil.copy2(build / 'ffmpeg' / file, package / file)
 import re
 components = (build / 'ffmpeg/config_components.h').read_text()

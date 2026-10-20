@@ -23,7 +23,7 @@ with tarfile.open(assets / (base + '-sources.tar.gz'), 'w:gz') as t:
         t.add(archive, arcname='sources/' + archive.name)
         sig = Path(str(archive) + '.asc')
         if sig.exists(): t.add(sig, arcname='sources/' + sig.name)
-    for dirname in ['scripts','config','native','harmony','docs','examples']:
+    for dirname in ['scripts','config','native','harmony','docs','examples','tests','.github']:
         t.add(ROOT / dirname, arcname='recipe/' + dirname)
     for filename in ['LICENSE', 'README.md']:
         t.add(ROOT / filename, arcname='recipe/' + filename)

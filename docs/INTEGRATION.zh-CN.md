@@ -39,6 +39,16 @@ HTTPS 输入需应用声明 `ohos.permission.INTERNET`，通过 `caFile` 提供�
 
 SDK 包的 bin/ffmpeg 和 bin/ffprobe 是 OHOS ELF。开发 shell 可以验证；App 内能否启动它们取决于沙箱/执行政策。本 HAR 没有把 main 重命名或嵌进应用。
 
+原生 SDK 的 CMake 导入配置可随解压目录搬移：
+
+```cmake
+find_package(FFmpeg CONFIG REQUIRED PATHS "<解压目录>/sdk" NO_DEFAULT_PATH)
+target_link_libraries(your_native_target PRIVATE FFmpeg::FFmpeg)
+# 也可按需选择 FFmpeg::avformat / avcodec / avfilter / avutil 等目标。
+```
+
+应用仍需打包 runtime/arm64-v8a 的运行库闭包；链接成功不能代替运行库打包。
+
 ## 版权与分发
 
 应用“关于/开源许可”页标明使用 FFmpeg、实际版本、LGPLv3-or-later、许可全文及**同次发布对应源码**入口。原生库与第三方 license 原文随包提供。原创桥接代码采用 MIT，FFmpeg 仍采用其构建对应的 LGPL；HAR 这个“静态共享包”名称不代表 FFmpeg 被静态链接，FFmpeg 继续以独立 so 动态链接。

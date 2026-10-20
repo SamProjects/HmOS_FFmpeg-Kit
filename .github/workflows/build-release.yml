@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: Publish a prerelease after both HAR builds pass
+        description: Publish a prerelease after all checks pass
         type: boolean
         default: true
 permissions:
@@ -16,12 +16,24 @@ concurrency:
   group: hmos-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  housekeeping:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Remove artifacts and former build caches
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/cleanup-actions-storage.sh
   verify:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - run: python3 -m unittest discover -s tests -v
-      - run: bash -n scripts/build-ohos.sh scripts/build-deps.sh scripts/test-native.sh
+      - run: bash -n scripts/build-ohos.sh scripts/build-deps.sh scripts/test-native.sh scripts/cleanup-actions-storage.sh
   media-test:
     needs: verify
     runs-on: ubuntu-24.04
@@ -29,85 +41,44 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - run: sudo apt-get update && sudo apt-get install -y build-essential nasm ffmpeg gnupg
-      - name: Exercise public API media pipeline with sanitizers
+      - name: Exercise media pipeline with sanitizers and timing checks
         run: bash scripts/test-native.sh
-  build:
-    needs: verify
+  build-release:
+    needs: [verify, media-test]
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        profile: [core, extended]
-    env:
-      CCACHE_DIR: ${{ github.workspace }}/work/ccache
-      CCACHE_MAXSIZE: 2G
-      CCACHE_COMPILERCHECK: content
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build pkg-config gnupg libgl1 unzip ccache openjdk-17-jre-headless
-      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
-        id: ccache
-        with:
-          path: work/ccache
-          key: hmos-ccache-${{ matrix.profile }}-${{ hashFiles('config/**', 'scripts/build-ohos.sh', 'scripts/build-deps.sh') }}
-      - name: Prepare pinned HarmonyOS SDK
-        run: python3 scripts/setup-sdk.py
-      - name: Cross compile FFmpeg and NAPI bridge
-        run: bash scripts/build-ohos.sh "${{ matrix.profile }}"
-      - uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
-        if: always() && github.event_name != 'pull_request' && steps.ccache.outputs.cache-hit != 'true'
-        with:
-          path: work/ccache
-          key: ${{ steps.ccache.outputs.cache-primary-key }}
-      - name: Build HAR and a consumer HAP
-        run: python3 scripts/build-har.py "${{ matrix.profile }}"
-      - name: Package SDK, symbols and corresponding sources
-        run: python3 scripts/release-assets.py "${{ matrix.profile }}"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: release-${{ matrix.profile }}
-          path: dist/assets/*
-          if-no-files-found: error
-      - name: Preserve diagnostics
-        if: failure()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: diagnostics-${{ matrix.profile }}
-          path: |
-            work/build/**/*.log
-            work/build/**/config.h
-            work/build/**/configure-args.txt
-            work/har/**/build/**/build.log
-            work/har/**/.hvigor/**/hvigor.log
-            work/sdk.json
-          if-no-files-found: ignore
-  release:
-    needs: [verify, build, media-test]
-    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish) || github.event_name == 'push')
-    runs-on: ubuntu-24.04
+    timeout-minutes: 180
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          pattern: release-*
-          merge-multiple: true
-          path: release-dist
-      - name: Publish validated SDK prerelease
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build pkg-config gnupg libgl1 unzip openjdk-17-jre-headless
+      - name: Prepare pinned HarmonyOS SDK
+        run: python3 scripts/setup-sdk.py
+      - name: Build core SDK, HAR and standalone consumer HAP
+        run: |
+          bash scripts/build-ohos.sh core
+          python3 scripts/build-har.py core
+          python3 scripts/release-assets.py core
+      - name: Build extended SDK, HAR and standalone consumer HAP
+        run: |
+          bash scripts/build-ohos.sh extended
+          python3 scripts/build-har.py extended
+          python3 scripts/release-assets.py extended
+      - name: Verify both release packages
+        run: python3 scripts/check-release.py dist/assets
+      - name: Publish directly from this runner to Release
+        if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.publish)
         env:
           GH_TOKEN: ${{ github.token }}
           REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          python3 scripts/check-release.py release-dist
           version=$(python3 -c 'import json; print(json.load(open("config/project.json"))["version"])')
           tag="v${version}-ci.${GITHUB_RUN_NUMBER}"
           if [[ "$REF_TYPE" == tag ]]; then tag="$REF_NAME"; fi
-          (cd release-dist; sha256sum *.har *.tar.gz *-manifest.json > SHA256SUMS)
+          (cd dist/assets; sha256sum *.har *.tar.gz *-manifest.json > SHA256SUMS)
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             draft=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
             target=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq .targetCommitish)
@@ -119,5 +90,21 @@ jobs:
               --target "$GITHUB_SHA" --prerelease --title "HmOS FFmpeg $tag" \
               --notes-file docs/RELEASE-NOTES.md
           fi
-          gh release upload "$tag" release-dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          gh release upload "$tag" dist/assets/* --clobber --repo "$GITHUB_REPOSITORY"
           gh release edit "$tag" --draft=false --prerelease --repo "$GITHUB_REPOSITORY"
+      - name: Remove temporary files on the runner
+        if: always()
+        run: python3 scripts/cleanup-runner.py
+  cleanup-storage:
+    needs: [housekeeping, verify, media-test, build-release]
+    if: always() && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Ensure no artifacts or former build caches remain
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/cleanup-actions-storage.sh

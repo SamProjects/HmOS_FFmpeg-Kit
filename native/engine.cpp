@@ -156,7 +156,11 @@ void drainFilter(Stream& s, AVFormatContext* output) {
         int rc = av_buffersink_get_frame(s.sink, f.get());
         if (rc == AVERROR(EAGAIN) || rc == AVERROR_EOF) break;
         check(rc);
-        if(f->pts != AV_NOPTS_VALUE) f->pts = av_rescale_q(f->pts, av_buffersink_get_time_base(s.sink), s.encoder->time_base);
+        AVRational sourceTime = av_buffersink_get_time_base(s.sink);
+        if(f->pts != AV_NOPTS_VALUE) f->pts = av_rescale_q(f->pts, sourceTime, s.encoder->time_base);
+        if(f->duration > 0) f->duration = av_rescale_q(f->duration, sourceTime, s.encoder->time_base);
+        f->time_base = s.encoder->time_base;
+        f->pict_type = AV_PICTURE_TYPE_NONE;
         writeEncoded(s, output, f.get()); av_frame_unref(f.get());
     }
 }
@@ -235,6 +239,9 @@ void convert(Task& task) {
             if(codec.empty() || codec == "copy" || task.operation == "remux") {
                 check(avcodec_parameters_copy(s->output->codecpar, in->codecpar));
                 s->output->codecpar->codec_tag = 0; s->output->time_base = in->time_base;
+                s->output->avg_frame_rate = in->avg_frame_rate;
+                s->output->r_frame_rate = in->r_frame_rate;
+                s->output->sample_aspect_ratio = in->sample_aspect_ratio;
             } else {
                 if(type != AVMEDIA_TYPE_VIDEO && type != AVMEDIA_TYPE_AUDIO) throw std::runtime_error("Only audio/video encoding supported");
                 auto* dec = avcodec_find_decoder(in->codecpar->codec_id); auto* enc = avcodec_find_encoder_by_name(codec.c_str());
@@ -278,6 +285,10 @@ void convert(Task& task) {
                 if(type == AVMEDIA_TYPE_AUDIO && s->encoder->frame_size) av_buffersink_set_frame_size(s->sink, s->encoder->frame_size);
                 check(avcodec_parameters_from_context(s->output->codecpar, s->encoder));
                 s->output->time_base = s->encoder->time_base;
+                if(type == AVMEDIA_TYPE_VIDEO) {
+                    s->output->avg_frame_rate = s->encoder->framerate;
+                    s->output->r_frame_rate = s->encoder->framerate;
+                }
             }
             check(av_dict_copy(&s->output->metadata, in->metadata, 0));
             streams.push_back(std::move(s));

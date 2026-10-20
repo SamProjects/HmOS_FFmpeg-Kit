@@ -56,4 +56,4 @@ CI 默认下载 config/sdk.lock.json 中固定 SHA-256 的 Huawei CLI 社区镜�
 
 原始项目代码 MIT；FFmpeg 二进制按 LGPLv3-or-later，第三方保留其条款。预发布意味着没有宣称真机执行、最低系统运行或 LGPL 替换安装验证通过。所有门禁状态在 manifest.json 中；静态/构建/HAP 打包证据与设备证据分开。正式 App 分发还必须落实对应源码可访问、notice、兼容库替换/重链接等义务。[替换验证](docs/replacement-and-relink.md)
 
-不满足 Zero-Patch、GPL/nonfree 禁用、依赖闭包或 HAR 消费编译的构建不得发布；不通过的任务上传诊断日志。某些 GPL 源文件存在于官方原始源码包中并不表示被链接到本 LGPL 构建。
+不满足 Zero-Patch、GPL/nonfree 禁用、依赖闭包或 HAR 消费编译的构建不得发布。构建和发布在同一个 runner 中完成，不上传 Actions Artifacts，不使用持久构建缓存；失败只保留 Actions 控制台日志。工作流开始及结束会清理本仓库旧 Artifacts 和本流程早期缓存，最终成品及对应源码直接存入 Release。某些 GPL 源文件存在于官方原始源码包中并不表示被链接到本 LGPL 构建。

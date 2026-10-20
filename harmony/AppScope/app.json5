@@ -1,1 +1,8 @@
-{"app":{"bundleName":"com.samprojects.hmosffmpeg","vendor":"SamProjects","versionCode":10000,"versionName":"0.1.0"}}
+{
+  "app": {
+    "bundleName": "com.samprojects.hmosffmpeg",
+    "vendor": "SamProjects",
+    "versionCode": 10000,
+    "versionName": "1.0.0"
+  }
+}

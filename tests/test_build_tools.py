@@ -41,6 +41,12 @@ class BuildToolsTests(unittest.TestCase):
             self.assertTrue(s['url'].startswith('https://'))
             self.assertNotIn('latest', s['url'])
 
+    def test_workflow_does_not_retain_artifacts_or_caches(self):
+        workflow = (ROOT / '.github/workflows/build-release.yml').read_text()
+        for action in ['actions/upload-artifact@', 'actions/download-artifact@', 'actions/cache@', 'actions/cache/save@']:
+            self.assertNotIn(action, workflow)
+        self.assertIn('cleanup-actions-storage.sh', workflow)
+
     def test_license_gate_rejects_gpl(self):
         old_argv = sys.argv[:]
         sys.argv = ['test', 'core']

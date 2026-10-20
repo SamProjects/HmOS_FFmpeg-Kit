@@ -27,6 +27,7 @@ export LD_LIBRARY_PATH="$OUT/lib"
 ASAN_OPTIONS=detect_leaks=1 ./work/native-test/pipeline-test "$ROOT/work/native-test/media"
 unset LD_LIBRARY_PATH
 for file in scaled.mp4 remux.mkv audio.wav; do
-  ffmpeg -v error -i "work/native-test/media/$file" -f null -
+  ffmpeg -v error -xerror -i "work/native-test/media/$file" -fps_mode passthrough -f null -
 done
+python3 tests/check-media.py work/native-test/media
 python3 scripts/fetch-sources.py --verify-only
