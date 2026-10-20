@@ -10,7 +10,12 @@ mkdir -p "$BUILD/sources"
 for dep in opus mbedtls zlib lame libvpx; do
   cp -a "$ROOT/work/src/$dep" "$BUILD/sources/$dep"
 done
-cmake_args=(-DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64
+case "${HMOS_ABI:-arm64-v8a}" in
+  arm64-v8a) HOST=aarch64-linux; VPX_TARGET=arm64-linux-gcc; VPX_AS="$CC" ;;
+  x86_64) HOST=x86_64-linux; VPX_TARGET=x86_64-linux-gcc; VPX_AS=nasm ;;
+  *) exit 2 ;;
+esac
+cmake_args=(-DCMAKE_SYSTEM_NAME=Linux "-DCMAKE_SYSTEM_PROCESSOR=${FFMPEG_ARCH:-aarch64}"
   "-DCMAKE_C_COMPILER=$CC" "-DCMAKE_CXX_COMPILER=$CXX"
   "-DCMAKE_AR=$AR" "-DCMAKE_RANLIB=$RANLIB"
   -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release
@@ -25,21 +30,21 @@ cmake --build "$BUILD/mbedtls" --parallel "${JOBS:-4}"
 cmake --install "$BUILD/mbedtls"
 mkdir -p "$BUILD/zlib"
 ( cd "$BUILD/zlib"
-  CHOST=aarch64-linux-ohos CFLAGS=-fPIC "$BUILD/sources/zlib/configure" --static --prefix="$PREFIX"
+  CHOST="$HOST-ohos" CFLAGS=-fPIC "$BUILD/sources/zlib/configure" --static --prefix="$PREFIX"
   make -j"${JOBS:-4}"
   make install
 )
 mkdir -p "$BUILD/lame" "$BUILD/vpx"
 ( cd "$BUILD/lame"
-  "$BUILD/sources/lame/configure" --host=aarch64-linux --prefix="$PREFIX" \
+  "$BUILD/sources/lame/configure" --host="$HOST" --prefix="$PREFIX" \
     --disable-shared --enable-static --disable-frontend --disable-gtktest \
     CFLAGS=-fPIC
   make -j"${JOBS:-4}"
   make install
 )
 ( cd "$BUILD/vpx"
-  AS="$CC" LD="$CC" CFLAGS=-fPIC "$BUILD/sources/libvpx/configure" \
-    --target=arm64-linux-gcc --prefix="$PREFIX" --enable-pic \
+  AS="$VPX_AS" LD="$CC" CFLAGS=-fPIC "$BUILD/sources/libvpx/configure" \
+    --target="$VPX_TARGET" --prefix="$PREFIX" --enable-pic \
     --disable-shared --enable-static --disable-examples --disable-tools \
     --disable-docs --disable-unit-tests --enable-vp9-highbitdepth
   make -j"${JOBS:-4}"

@@ -4,8 +4,8 @@ import re
 import sys
 
 PROFILE = sys.argv[1]
-BUILD = WORK / 'build' / PROFILE
-PREFIX = WORK / 'prefix' / PROFILE
+BUILD = WORK / 'build' / profile_key(PROFILE)
+PREFIX = WORK / 'prefix' / profile_key(PROFILE)
 SDK = Path(os.environ.get('OHOS_NATIVE', '.'))
 READELF = SDK / 'llvm/bin/llvm-readelf'
 # The SDK toolchain injects deviceinfo for OHOS_COMPATIBLE_SDK_VERSION;
@@ -18,7 +18,8 @@ def inspect(files, report):
     records = []
     for p in files:
         h = run([READELF, '-h', '-l', '-d', '--version-info', p], capture_output=True, text=True).stdout
-        if 'AArch64' not in h or 'ELF64' not in h:
+        machine = 'AArch64' if ABI == 'arm64-v8a' else 'Advanced Micro Devices X86-64'
+        if machine not in h or 'ELF64' not in h:
             raise ValueError('Wrong target: ' + str(p))
         if re.search(r'GLIBC_|libc\.so\.6|liblog\.so|TEXTREL', h):
             raise ValueError('Host/Android dependency or TEXTREL: ' + p.name)

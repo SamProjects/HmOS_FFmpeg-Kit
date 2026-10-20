@@ -5,19 +5,20 @@ import shutil
 import sys
 
 profile = sys.argv[1]
-build = WORK / 'build' / profile
-prefix = WORK / 'prefix' / profile
+key = profile_key(profile)
+build = WORK / 'build' / key
+prefix = WORK / 'prefix' / key
 sdk = Path(os.environ['OHOS_NATIVE'])
-package = DIST / profile
+package = DIST / key
 package.mkdir(parents=True, exist_ok=False)
-runtime = package / 'runtime/arm64-v8a'
+runtime = package / 'runtime' / ABI
 runtime.mkdir(parents=True)
 for lib in (prefix / 'lib').glob('lib*-*.so'):
     shutil.copy2(lib, runtime / lib.name)
 shutil.copy2(build / 'bridge/libhmosffmpeg.so', runtime / 'libhmosffmpeg.so')
-shutil.copy2(sdk / 'llvm/lib/aarch64-linux-ohos/libc++_shared.so', runtime / 'libc++_shared.so')
+shutil.copy2(sdk / 'llvm/lib' / TRIPLE / 'libc++_shared.so', runtime / 'libc++_shared.so')
 # SDK runtime is kept verbatim. Library build IDs/symbols are never manufactured.
-symbols = package / 'symbols/arm64-v8a'
+symbols = package / 'symbols' / ABI
 symbols.mkdir(parents=True)
 for lib in runtime.glob('*.so'):
     if lib.name == 'libc++_shared.so':
@@ -39,9 +40,9 @@ cmake_config += ['if(NOT TARGET FFmpeg::FFmpeg)', '  add_library(FFmpeg::FFmpeg 
     '  set_target_properties(FFmpeg::FFmpeg PROPERTIES INTERFACE_LINK_LIBRARIES "FFmpeg::avdevice;FFmpeg::avfilter;FFmpeg::avformat;FFmpeg::avcodec;FFmpeg::swscale;FFmpeg::swresample;FFmpeg::avutil")', 'endif()']
 (package / 'sdk/FFmpegConfig.cmake').write_text('\n'.join(cmake_config) + '\n')
 shutil.copytree(prefix / 'bin', package / 'bin')
-shutil.copytree(ROOT / 'harmony', WORK / 'har' / profile)
-har = WORK / 'har' / profile / 'ffmpeg'
-shutil.copytree(runtime, har / 'libs/arm64-v8a')
+shutil.copytree(ROOT / 'harmony', WORK / 'har' / key)
+har = WORK / 'har' / key / 'ffmpeg'
+shutil.copytree(runtime, har / 'libs' / ABI)
 licenses = package / 'licenses'
 licenses.mkdir()
 for name, source in SOURCES.items():
@@ -77,7 +78,7 @@ gate = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(gate)
 gate.inspect(list(runtime.glob('*.so')) + list((package / 'bin').iterdir()), package / 'elf.json')
 write_json(package / 'manifest.json', {
-    'project': PROJECT, 'profile': profile, 'commit': os.environ.get('GITHUB_SHA', 'local'),
+    'project': PROJECT, 'profile': profile, 'abi': ABI, 'commit': os.environ.get('GITHUB_SHA', 'local'),
     'validation': {'sourceIntegrity': True, 'licenseConfig': True, 'elfClosure': True, 'device': False, 'appRuntime': False},
     'libraries': {p.name: digest(p) for p in runtime.glob('*.so')}, 'sources': SOURCES,
     'naming': 'GNU make command-line overrides; no source or ELF patching'})

@@ -1,7 +1,8 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "ffmpeg": "9.0.2",
   "abi": "arm64-v8a",
+  "abis": ["arm64-v8a", "x86_64"],
   "minimumApi": 12,
   "compileSdk": "from-locked-sdk",
   "compatibleSdk": "5.0.0(12)",

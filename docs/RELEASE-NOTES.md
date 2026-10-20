@@ -1,4 +1,6 @@
-HarmonyOS arm64-v8a FFmpeg SDK prerelease.
+HarmonyOS arm64-v8a and x86_64 FFmpeg SDK prerelease, with single-ABI and universal HAR packages.
+
+The *-all.har files contain both supported HarmonyOS application ABIs. Each universal HAR is consumed by separate ARM64-only, x86_64-only and dual-ABI sample HAP builds. Explicit nativeLib.filter exclusions and archive/hash assertions verify the resulting HAP includes exactly the requested ABI closure. See *-all-consumer-validation.json for measured HAP/native-library sizes. This does not assert AppGallery cloud splitting or actual device download size; no store publication test was performed. See docs/ABI-DISTRIBUTION.zh-CN.md for consumer configuration.
 
 Download the extended HAR for Opus, MP3, VP8/VP9 and TLS support; core uses built-in FFmpeg components. Both contain the ArkTS/NAPI API and dynamically linked, unpatched official FFmpeg libraries. Native headers/libraries, original ffmpeg/ffprobe executables, debugging symbols, exact corresponding sources, build recipes, license texts, manifests and SHA-256 checksums accompany each HAR.
 

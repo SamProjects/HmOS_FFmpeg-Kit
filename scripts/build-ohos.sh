@@ -9,12 +9,20 @@ export LC_ALL=C TZ=UTC
 export SOURCE_DATE_EPOCH="$(python3 -c 'import json; print(json.load(open("config/project.json"))["sourceDateEpoch"])')"
 python3 scripts/fetch-sources.py
 SDK=$(realpath "$OHOS_NATIVE")
-BUILD="$ROOT/work/build/$PROFILE"
-PREFIX="$ROOT/work/prefix/$PROFILE"
+ABI="${HMOS_ABI:-arm64-v8a}"
+KEY="$PROFILE"
+case "$ABI" in
+  arm64-v8a) TARGET=aarch64-linux-ohos12.0.0; ARCH=aarch64; CPU=armv8-a; MARCH=armv8-a ;;
+  x86_64) TARGET=x86_64-linux-ohos12.0.0; ARCH=x86_64; CPU=x86-64; MARCH=x86-64; KEY="$PROFILE-$ABI" ;;
+  *) echo "Unsupported HarmonyOS application ABI: $ABI"; exit 2 ;;
+esac
+export HMOS_ABI="$ABI" FFMPEG_ARCH="$ARCH"
+BUILD="$ROOT/work/build/$KEY"
+PREFIX="$ROOT/work/prefix/$KEY"
 test ! -e "$BUILD" && test ! -e "$PREFIX" || { echo 'Use a fresh build tree'; exit 2; }
 mkdir -p "$BUILD" "$PREFIX"
 export OHOS_WRAPPER_SDK="$SDK"
-export OHOS_WRAPPER_TARGET=aarch64-linux-ohos12.0.0
+export OHOS_WRAPPER_TARGET="$TARGET"
 cat > "$BUILD/cc-ohos" <<'SH'
 #!/usr/bin/env bash
 exec "$OHOS_WRAPPER_SDK/llvm/bin/clang" --target="$OHOS_WRAPPER_TARGET" --sysroot="$OHOS_WRAPPER_SDK/sysroot" "$@"
@@ -38,7 +46,7 @@ if [[ "$PROFILE" == extended ]]; then
 fi
 mkdir "$BUILD/ffmpeg"
 cd "$BUILD/ffmpeg"
-args=("--prefix=$PREFIX" --target-os=linux --arch=aarch64 --cpu=armv8-a
+args=("--prefix=$PREFIX" --target-os=linux "--arch=$ARCH" "--cpu=$CPU"
   --enable-cross-compile "--sysroot=$SDK/sysroot"
   "--cc=$CC" "--cxx=$CXX" "--ld=$CC" "--as=$CC"
   "--host-cc=$(command -v cc)" "--ar=$AR" "--ranlib=$RANLIB"
@@ -48,7 +56,7 @@ args=("--prefix=$PREFIX" --target-os=linux --arch=aarch64 --cpu=armv8-a
   --enable-ffmpeg --enable-ffprobe --disable-ffplay --disable-doc
   --enable-network --enable-pthreads --disable-linux-perf
   --disable-indevs --disable-outdevs
-  "--extra-cflags=-O2 -g -fPIC -march=armv8-a -I$PREFIX/include"
+  "--extra-cflags=-O2 -g -fPIC -march=$MARCH -I$PREFIX/include"
   "--extra-ldflags=-fuse-ld=lld -L$PREFIX/lib -Wl,-z,relro,-z,now,--build-id=sha1"
   --extra-ldexeflags=-pie "${extra[@]}")
 printf '%s\n' "${args[@]}" > configure-args.txt
@@ -66,7 +74,7 @@ python3 scripts/fetch-sources.py --verify-only
 python3 scripts/verify-build.py "$PROFILE"
 FFMPEG_PREFIX="$PREFIX" cmake -S native -B "$BUILD/bridge" -G Ninja \
   -DCMAKE_TOOLCHAIN_FILE="$SDK/build/cmake/ohos.toolchain.cmake" \
-  -DOHOS_ARCH=arm64-v8a -DOHOS_COMPATIBLE_SDK_VERSION=12 \
+  "-DOHOS_ARCH=$ABI" -DOHOS_COMPATIBLE_SDK_VERSION=12 \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build "$BUILD/bridge" --parallel "${JOBS:-4}"
 python3 scripts/package.py "$PROFILE"

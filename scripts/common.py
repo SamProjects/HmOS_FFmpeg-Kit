@@ -13,6 +13,15 @@ WORK = ROOT / 'work'
 DIST = ROOT / 'dist'
 PROJECT = json.loads((ROOT / 'config/project.json').read_text())
 SOURCES = json.loads((ROOT / 'config/sources.lock.json').read_text())
+ABI = os.environ.get('HMOS_ABI', PROJECT['abi'])
+if ABI not in PROJECT['abis']:
+    raise ValueError('Unsupported HarmonyOS application ABI: ' + ABI)
+TRIPLE = {'arm64-v8a':'aarch64-linux-ohos', 'x86_64':'x86_64-linux-ohos'}[ABI]
+
+
+def profile_key(profile, abi=None):
+    abi = abi or ABI
+    return profile if abi == 'arm64-v8a' else profile + '-' + abi
 
 
 def run(args, **kw):

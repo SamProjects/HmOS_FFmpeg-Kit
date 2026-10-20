@@ -1,12 +1,14 @@
 # 导入鸿蒙项目
 
-下载同一次 Release 的 `hmos-ffmpeg-1.0.0-extended-arm64-v8a.har`，放入应用的 `entry/libs/`，在 **entry 模块** `oh-package.json5` 添加：
+下载同一次 Release 的 `hmos-ffmpeg-1.0.1-extended-all.har`（含 arm64-v8a、x86_64），或选择 `-arm64-v8a.har` / `-x86_64.har` 单架构包，放入应用的 `entry/libs/`，在 **entry 模块** `oh-package.json5` 添加：
 
 ```json
-{"dependencies":{"@samprojects/hmos-ffmpeg":"file:./libs/hmos-ffmpeg-1.0.0-extended-arm64-v8a.har"}}
+{"dependencies":{"@samprojects/hmos-ffmpeg":"file:./libs/hmos-ffmpeg-1.0.1-extended-all.har"}}
 ```
 
 安装依赖（ohpm install），目标 ABI 选择 arm64-v8a，兼容 API 12 及以上。HAR 包含桥接、FFmpeg so 和所需 C++ runtime，不要再同时引入另一套同名 FFmpeg so。消费项目需要 DevEco/Command Line Tools 中支持本包模型的 Hvigor；原生最低 API 和实际运行兼容性仍需在目标设备验证。
+
+使用全架构 HAR 时，请按 [ABI 与体积说明](ABI-DISTRIBUTION.zh-CN.md)同时配置编译 ABI 和 `nativeLib.filter.excludes`；仓库消费示例默认只打包 ARM64，CI 另外验证 x86_64 和双架构消费者。不要把 SDK/调试符号/源码压缩包放进应用 rawfile。
 
 ```typescript
 import { FFmpeg } from '@samprojects/hmos-ffmpeg';

@@ -52,19 +52,20 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build pkg-config gnupg libgl1 unzip openjdk-17-jre-headless
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build nasm pkg-config gnupg libgl1 unzip openjdk-17-jre-headless
       - name: Prepare pinned HarmonyOS SDK
         run: python3 scripts/setup-sdk.py
-      - name: Build core SDK, HAR and standalone consumer HAP
+      - name: Build all ABIs and validate single-ABI and universal HAR consumers
         run: |
-          bash scripts/build-ohos.sh core
-          python3 scripts/build-har.py core
-          python3 scripts/release-assets.py core
-      - name: Build extended SDK, HAR and standalone consumer HAP
-        run: |
-          bash scripts/build-ohos.sh extended
-          python3 scripts/build-har.py extended
-          python3 scripts/release-assets.py extended
+          for profile in core extended; do
+            for abi in arm64-v8a x86_64; do
+              export HMOS_ABI="$abi"
+              bash scripts/build-ohos.sh "$profile"
+              python3 scripts/build-har.py "$profile"
+              python3 scripts/release-assets.py "$profile"
+            done
+            python3 scripts/build-har.py "$profile" --universal
+          done
       - name: Verify both release packages
         run: python3 scripts/check-release.py dist/assets
       - name: Publish directly from this runner to Release
@@ -78,7 +79,7 @@ jobs:
           version=$(python3 -c 'import json; print(json.load(open("config/project.json"))["version"])')
           tag="v${version}-ci.${GITHUB_RUN_NUMBER}"
           if [[ "$REF_TYPE" == tag ]]; then tag="$REF_NAME"; fi
-          (cd dist/assets; sha256sum *.har *.tar.gz *-manifest.json > SHA256SUMS)
+          (cd dist/assets; sha256sum *.har *.tar.gz *.json > SHA256SUMS)
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             draft=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
             target=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq .targetCommitish)

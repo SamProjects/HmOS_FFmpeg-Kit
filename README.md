@@ -1,6 +1,6 @@
 # HmOS FFmpeg Kit
 
-官方 FFmpeg 9.0.2 → HarmonyOS NDK/clang → arm64-v8a 动态库 → 可本地导入的 HAR。
+官方 FFmpeg 9.0.2 → HarmonyOS NDK/clang → arm64-v8a / x86_64 动态库 → 可本地导入的单架构或全架构 HAR。
 
 保持 upstream 源码 Zero-Patch；`--enable-version3 --disable-gpl --disable-nonfree`。ArkTS/NAPI 桥接通过公开 libav API 工作，不修改 fftools，不向 FFmpeg 注册 OHOS codec。硬件编解码由应用自己的 HarmonyOS AVCodec Engine 提供，本仓库不宣称已实现该硬件后端。
 
@@ -20,12 +20,15 @@ await task.result;
 
 [完整导入与 API 说明](docs/INTEGRATION.zh-CN.md) · [开发规范](docs/DEVELOPMENT.zh-CN.md)
 
+`*-all.har` 同时包含当前 HarmonyOS 应用支持的 arm64-v8a、x86_64；不包含已不受 HarmonyOS 应用工具链支持的 armeabi-v7a，也不包含 x86 32 位。[全架构包与应用体积说明](docs/ABI-DISTRIBUTION.zh-CN.md)说明如何在消费工程里排除无关架构，不能只靠 HAR 大小推算用户下载大小，也不假定应用市场必然自动裁剪。
+
 [首次完整 CI 与发布验证记录](docs/VALIDATION.zh-CN.md)：core/extended HAR 和独立消费 HAP 均已构建通过；真机运行尚未验证。
 
 | 产物 | 内容 |
 |---|---|
 | core.har | 内置可用 LGPL 编解码/封装/滤镜，ArkTS/NAPI，FFmpeg 动态库 |
 | extended.har | core + libopus、LAME、libvpx、zlib、mbedTLS |
+| *-all.har | 同一 HAR 包含 ARM64 与 x86_64；两版均验证按 ABI 裁剪和双架构 HAP |
 | sdk.tar.gz | 原生头文件/so、运行库、官方 ffmpeg/ffprobe CLI、调试符号、证据、SBOM、许可 |
 | sources.tar.gz | 对应官方源码原包及签名、精确依赖源码、外置构建配方和完整性清单 |
 

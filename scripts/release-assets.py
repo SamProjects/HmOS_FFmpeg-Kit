@@ -4,10 +4,10 @@ import shutil
 import sys
 
 profile = sys.argv[1]
-package = DIST / profile
+package = DIST / profile_key(profile)
 assets = DIST / 'assets'
 assets.mkdir(exist_ok=True)
-base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-arm64-v8a'
+base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-{ABI}'
 har = package / (base + '.har')
 if not har.exists() or not json.loads((package / 'consumer-validation.json').read_text())['consumerHapBuilt']:
     raise SystemExit('Missing validated HAR')

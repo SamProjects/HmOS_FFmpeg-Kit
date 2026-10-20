@@ -72,21 +72,46 @@ class BuildToolsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             directory = Path(d)
             for profile in ['core','extended']:
-                base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-arm64-v8a'
-                (directory / (base + '.har')).write_bytes(b'checksum-test-fixture')
-                (directory / (base + '-sources.tar.gz')).write_bytes(b'source-test-fixture')
-                manifest = {'profile':profile,'project':PROJECT,'commit':__import__('os').environ.get('GITHUB_SHA','local'),
-                            'validation':dict(sourceIntegrity=True,licenseConfig=True,elfClosure=True)}
-                (directory / (base + '-manifest.json')).write_text(json.dumps(manifest))
-                with tarfile.open(directory / (base + '-sdk.tar.gz'), 'w:gz') as t:
-                    info = tarfile.TarInfo(base + '/consumer-validation.json')
-                    data = b'{"consumerHapBuilt":true}'
-                    info.size = len(data); t.addfile(info, io.BytesIO(data))
-                for path in list(directory.glob(base + '*')):
-                    (directory / (path.name + '.sha256')).write_text(digest(path) + '  ' + path.name + '\n')
+                for abi in PROJECT['abis']:
+                    base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-{abi}'
+                    (directory / (base + '.har')).write_bytes(b'checksum-test-fixture')
+                    (directory / (base + '-sources.tar.gz')).write_bytes(b'source-test-fixture')
+                    manifest = {'profile':profile,'project':PROJECT,'abi':abi,'commit':__import__('os').environ.get('GITHUB_SHA','local'),
+                                'validation':dict(sourceIntegrity=True,licenseConfig=True,elfClosure=True)}
+                    (directory / (base + '-manifest.json')).write_text(json.dumps(manifest))
+                    with tarfile.open(directory / (base + '-sdk.tar.gz'), 'w:gz') as t:
+                        info = tarfile.TarInfo(base + '/consumer-validation.json')
+                        data = b'{"consumerHapBuilt":true}'
+                        info.size = len(data); t.addfile(info, io.BytesIO(data))
+                base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-all'
+                (directory / (base + '.har')).write_bytes(b'universal-fixture')
+                report = {'harSha256':digest(directory / (base + '.har')), 'consumerHapBuilt':True,
+                          'selections':[{'selectedAbis':a,'packagedAbis':sorted(a),'libraryCount':9*len(a)}
+                                        for a in [[abi] for abi in PROJECT['abis']] + [PROJECT['abis']]]}
+                (directory / (base + '-consumer-validation.json')).write_text(json.dumps(report))
+            for path in list(directory.iterdir()):
+                (directory / (path.name + '.sha256')).write_text(digest(path) + '  ' + path.name + '\n')
             gate.validate(directory)
             next(directory.glob('*.har')).write_bytes(b'modified')
             with self.assertRaises(ValueError): gate.validate(directory)
+
+    def test_hap_rejects_unwanted_abi_missing_or_changed_library(self):
+        from hap_validation import validate_hap
+        import hashlib
+        import zipfile
+        blob = b'library-bytes'
+        runtime = {abi:{'libexample.so':hashlib.sha256(blob).hexdigest()} for abi in PROJECT['abis']}
+        with tempfile.TemporaryDirectory() as d:
+            hap = Path(d) / 'test.hap'
+            with zipfile.ZipFile(hap, 'w') as z:
+                for abi in PROJECT['abis']: z.writestr('libs/' + abi + '/libexample.so', blob)
+            with self.assertRaises(ValueError): validate_hap(hap, runtime, ['arm64-v8a'])
+            validate_hap(hap, runtime, PROJECT['abis'])
+            with zipfile.ZipFile(hap, 'w') as z: z.writestr('libs/arm64-v8a/libexample.so', blob)
+            validate_hap(hap, runtime, ['arm64-v8a'])
+            with self.assertRaises(ValueError): validate_hap(hap, runtime, PROJECT['abis'])
+            with zipfile.ZipFile(hap, 'w') as z: z.writestr('libs/arm64-v8a/libexample.so', b'altered')
+            with self.assertRaises(ValueError): validate_hap(hap, runtime, ['arm64-v8a'])
 
 
 if __name__ == '__main__': unittest.main()

@@ -1,41 +1,82 @@
 #!/usr/bin/env python3
 from common import *
+from hap_validation import validate_hap
 import shutil
 import sys
 
 profile = sys.argv[1]
-directory = WORK / 'har' / profile
+universal = '--universal' in sys.argv[2:]
+abis = PROJECT['abis'] if universal else [ABI]
+key = profile + '-all' if universal else profile_key(profile)
+directory = WORK / 'har' / key
+package = DIST / key
+package.mkdir(parents=True, exist_ok=True)
+if universal:
+    shutil.copytree(ROOT / 'harmony', directory)
+    module = directory / 'ffmpeg'
+    for abi in abis:
+        shutil.copytree(DIST / profile_key(profile, abi) / 'runtime' / abi, module / 'libs' / abi)
+    shutil.copytree(DIST / profile / 'licenses', module / 'licenses')
+    shutil.copytree(DIST / profile / 'licenses', module / 'src/main/resources/rawfile/hmos_ffmpeg_licenses')
+    shutil.copy2(ROOT / 'docs/INTEGRATION.zh-CN.md', module / 'README.md')
+har_profile_path = directory / 'ffmpeg/build-profile.json5'
+har_profile = json.loads(har_profile_path.read_text())
+har_profile['buildOption']['externalNativeOptions'] = {'abiFilters':abis}
+write_json(har_profile_path, har_profile)
 run(['ohpm', 'install', '--all'], cwd=directory)
 run(['hvigorw', '--mode', 'module', '-p', 'product=default', '-p', 'module=ffmpeg@default',
      '-p', 'buildMode=release', 'assembleHar', '--no-daemon'], cwd=directory)
 candidates = list((directory / 'ffmpeg/build/default/outputs').rglob('*.har'))
 if len(candidates) != 1:
     raise SystemExit(f'Expected one HAR, got {candidates}')
-output = DIST / profile / f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-arm64-v8a.har'
+base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-' + ('all' if universal else ABI)
+output = package / (base + '.har')
 shutil.copy2(candidates[0], output)
+expected = {abi: {p.name:digest(p) for p in (DIST / profile_key(profile, abi) / 'runtime' / abi).glob('*.so')}
+            for abi in abis}
 with tarfile.open(output) as t:
-    names = t.getnames()
-    for name in ['libhmosffmpeg.so'] + [x.name for x in (DIST / profile / 'runtime/arm64-v8a').glob('*.so')]:
-        if not any(n.endswith('/libs/arm64-v8a/' + name) or n == 'libs/arm64-v8a/' + name for n in names):
-            raise SystemExit('HAR missing library: ' + name)
-    if not any(n.endswith('/Index.ets') or n == 'Index.ets' for n in names):
-        raise SystemExit('HAR missing ArkTS entry')
-write_json(DIST / profile / 'har-validation.json', {'harSha256':digest(output),'structure':True})
-# Validate a separate project consuming the artifact, not a source-module dependency.
-consumer = WORK / 'consumer' / profile
-shutil.copytree(ROOT / 'examples/consumer', consumer)
-(consumer / 'entry/libs').mkdir()
-shutil.copy2(output, consumer / 'entry/libs/hmos-ffmpeg.har')
-run(['ohpm', 'install', '--all'], cwd=consumer)
-run(['hvigorw', '--mode', 'module', '-p', 'product=default', '-p', 'module=entry@default',
-     '-p', 'buildMode=debug', 'assembleHap', '--no-daemon'], cwd=consumer)
-haps = list((consumer / 'entry/build/default/outputs').rglob('*.hap'))
-if not haps:
-    raise SystemExit('Consumer HAP not built')
-import zipfile
-with zipfile.ZipFile(haps[0]) as z:
-    files = z.namelist()
-    for lib in (DIST / profile / 'runtime/arm64-v8a').glob('*.so'):
-        if 'libs/arm64-v8a/' + lib.name not in files:
-            raise SystemExit('Consumer HAP missing ' + lib.name)
-write_json(DIST / profile / 'consumer-validation.json', {'harSha256':digest(output),'consumerHapBuilt':True,'deviceRun':False})
+    members = {m.name.removeprefix('./').removeprefix('package/'):m for m in t.getmembers()}
+    for abi, libraries in expected.items():
+        if len(libraries) != 9:
+            raise ValueError('Expected FFmpeg, bridge and C++ runtime closure: ' + abi)
+        for name, sha in libraries.items():
+            member = members.get(f'libs/{abi}/{name}')
+            if not member or hashlib.sha256(t.extractfile(member).read()).hexdigest() != sha:
+                raise ValueError('HAR missing or altered library: ' + abi + '/' + name)
+    if 'Index.ets' not in members:
+        raise ValueError('HAR missing ArkTS entry')
+write_json(package / 'har-validation.json', {'harSha256':digest(output),'abis':abis,'structure':True})
+
+# Consume the real HAR in independent projects. Explicit packaging exclusions
+# are essential: abiFilters alone controls compilation, not every prebuilt .so.
+selections = [[abi] for abi in abis] + ([abis] if universal else [])
+reports = []
+for selected in selections:
+    selection = '-'.join(selected)
+    consumer = WORK / 'consumer' / key / selection
+    shutil.copytree(ROOT / 'examples/consumer', consumer)
+    (consumer / 'entry/libs').mkdir()
+    shutil.copy2(output, consumer / 'entry/libs/hmos-ffmpeg.har')
+    build_profile = json.loads((consumer / 'entry/build-profile.json5').read_text())
+    build_profile['buildOption'] = {
+        'externalNativeOptions':{'abiFilters':selected},
+        'nativeLib':{'debugSymbol':{'strip':False}, 'filter':{'excludes':[
+            '**/' + abi + '/**' for abi in PROJECT['abis'] if abi not in selected]}}}
+    write_json(consumer / 'entry/build-profile.json5', build_profile)
+    run(['ohpm', 'install', '--all'], cwd=consumer)
+    run(['hvigorw', '--mode', 'module', '-p', 'product=default', '-p', 'module=entry@default',
+         '-p', 'buildMode=debug', 'assembleHap', '--no-daemon'], cwd=consumer)
+    haps = list((consumer / 'entry/build/default/outputs').rglob('*.hap'))
+    if len(haps) != 1:
+        raise ValueError('Expected one consumer HAP')
+    reports.append(validate_hap(haps[0], expected, selected))
+report = {'harSha256':digest(output), 'consumerHapBuilt':True, 'deviceRun':False,
+          'cloudDistributionTested':False, 'selections':reports}
+write_json(package / 'consumer-validation.json', report)
+if universal:
+    assets = DIST / 'assets'
+    assets.mkdir(exist_ok=True)
+    shutil.copy2(output, assets / output.name)
+    write_json(assets / (base + '-consumer-validation.json'), report)
+    for name in [output.name, base + '-consumer-validation.json']:
+        (assets / (name + '.sha256')).write_text(digest(assets / name) + '  ' + name + '\n')
