@@ -20,6 +20,8 @@ await task.result;
 
 [完整导入与 API 说明](docs/INTEGRATION.zh-CN.md) · [开发规范](docs/DEVELOPMENT.zh-CN.md)
 
+[首次完整 CI 与发布验证记录](docs/VALIDATION.zh-CN.md)：core/extended HAR 和独立消费 HAP 均已构建通过；真机运行尚未验证。
+
 | 产物 | 内容 |
 |---|---|
 | core.har | 内置可用 LGPL 编解码/封装/滤镜，ArkTS/NAPI，FFmpeg 动态库 |

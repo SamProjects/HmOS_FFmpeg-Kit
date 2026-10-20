@@ -4,6 +4,8 @@
 
 目标仓库：`SamProjects/HmOS_FFmpeg-Kit`。本文是实施规范和构建模板，不是已经通过 HarmonyOS 编译、上架审核或真机测试的报告。
 
+实施入口：实际可执行配方以仓库 `scripts/`、`config/` 和工作流为准，本文代码块用于解释基线。当前实现使用外置 GNU make 参数生成 `libavcodec-63.so` 等库名，不修改源码或 ELF；依赖安装到独立绝对 prefix，清空 `PKG_CONFIG_SYSROOT_DIR`，避免重复 staging 路径。对应 HAR 使用方法见 `INTEGRATION.zh-CN.md`。按用户要求，CI 不保存 Actions Artifacts，也不使用持久缓存；候选成品直接发布到标明验证边界的 Release 预发布版。
+
 ## 1. 目标与不可突破的边界
 
 使用 FFmpeg 官方最新稳定发布源码，Zero-Patch，通过 HarmonyOS Native SDK 内的 clang 交叉编译出 arm64-v8a 共享库。构建采用 LGPLv3-or-later 口径，禁止 GPL、nonfree 组件；在平台能力和许可允许的范围内尽可能保留编解码、封装、滤镜、协议和探测功能。
@@ -433,12 +435,12 @@ gate 必须 fail closed：
 4. 依赖锁白名单、SPDX、SBOM、链接日志、NEEDED 与递归许可一致；静态吸入的外部依赖不能靠 NEEDED 检出，必须审查构建输入。
 5. CLI 两项和预期共享库完整；架构、SONAME、NEEDED、API、导出、运行期依赖闭包通过。
 6. required-capabilities 与实际枚举对比；core/extended 分开标准；任何功能下降都生成解释并阻止无说明发布。
-7. 真机证据绑定 FFmpeg 版本、提交 SHA、包哈希、SDK/API、设备系统、profile；旧版本证据不能自动复用。设备 runner 不可用时上传候选 artifact，禁止标为正式已验证 release。
+7. 真机证据绑定 FFmpeg 版本、提交 SHA、包哈希、SDK/API、设备系统、profile；旧版本证据不能自动复用。设备 runner 不可用时仅发布明确声明未真机验证的 Release 预发布候选包，禁止标为正式已验证 release；不上传 Actions Artifacts。
 8. 同版源码包、许可文件、源码下载入口、替换流程记录齐全；私有仓库链接不能充当所有 App 用户可访问的源码入口。
 
 SDK 缓存与发布包分离，按 SDK 许可决定如何供应 CI；不得公开 SDK 安装包、签名密钥和凭据。默认只读 workflow 权限，仅发布 job 按需写权限；第三方 actions 锁 commit，不允许不受信 PR 获得签名/设备/发布 secrets。
 
-缓存键包含源码哈希、SDK/clang 身份、API、ABI、profile、依赖锁和构建配方哈希；不能复用其他主版本对象目录。记录可复现构建偏差；SOURCE_DATE_EPOCH 只解决部分时间信息，不自动保证 bit-for-bit 一致。
+本项目按用户要求禁用持久构建缓存；构建成功或失败都不保留 Actions Artifacts，成品及对应源码仅存于 Release。runner 上的临时目录在结束时清理，历史 Artifacts 和本流程旧缓存由清理 job 删除。记录可复现构建偏差；SOURCE_DATE_EPOCH 只解决部分时间信息，不自动保证 bit-for-bit 一致。
 
 ## 15. 升级 FFmpeg 的流程
 
