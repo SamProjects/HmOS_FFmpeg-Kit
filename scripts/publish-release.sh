@@ -20,9 +20,10 @@ for attempt in 1 2 3; do
   if [[ "$attempt" != 3 ]]; then sleep 10; fi
 done
 [[ "$uploaded" == true ]] || { echo '上传失败，保留草稿供排查，不公开不完整发布。'; exit 1; }
+release_id=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json databaseId --jq .databaseId)
 remote=$(mktemp)
 trap 'rm -f "$remote"' EXIT
-gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$remote"
+gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" > "$remote"
 python3 scripts/check-upload.py dist/assets "$remote"
 for attempt in 1 2 3; do
   if gh release edit "$RELEASE_TAG" --draft=false --prerelease \
