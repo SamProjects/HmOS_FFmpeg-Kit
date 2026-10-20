@@ -1,0 +1,9 @@
+{
+  "version": "26.0.0.821",
+  "origin": "Huawei Command Line Tools; pinned community mirror for CI, not redistributed in this project's releases",
+  "baseUrl": "https://github.com/ErBWs/ohos-sdk/releases/download/26.0.0.821/",
+  "parts": {
+    "ohos-sdk-linux-amd64.tar.gz.aa": "4321eb328558169e9531594139910a42b1c88057fb09f852be85ff2487e6adbc",
+    "ohos-sdk-linux-amd64.tar.gz.ab": "26e9ae251e761fbc9ec4e7ad780b5b291130e7824af2324167530941e11ad592"
+  }
+}

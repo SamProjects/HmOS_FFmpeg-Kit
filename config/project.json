@@ -1,0 +1,10 @@
+{
+  "version": "0.1.0",
+  "ffmpeg": "9.0.2",
+  "abi": "arm64-v8a",
+  "minimumApi": 12,
+  "compileSdk": "26.0.0(26)",
+  "compatibleSdk": "5.0.0(12)",
+  "sourceDateEpoch": 1789699562,
+  "signingFingerprint": "FCF986EA15E6E293A5644F10B4322F04D67658D8"
+}

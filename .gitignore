@@ -1,0 +1,9 @@
+work/
+dist/
+**/build/
+**/.hvigor/
+**/oh_modules/
+**/node_modules/
+local.properties
+__pycache__/
+*.pyc

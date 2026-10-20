@@ -1,0 +1,7 @@
+{
+  "app": {
+    "products": [{"name":"default","compileSdkVersion":"26.0.0(26)","compatibleSdkVersion":"5.0.0(12)","runtimeOS":"HarmonyOS"}],
+    "buildModeSet": [{"name":"debug"},{"name":"release"}]
+  },
+  "modules": [{"name":"ffmpeg","srcPath":"./ffmpeg","targets":[{"name":"default","applyToProducts":["default"]}]}]
+}
