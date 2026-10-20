@@ -2,6 +2,7 @@ name: HarmonyOS HAR build and release
 on:
   push:
     branches: [main]
+    paths-ignore: ['.github/workflows/recover-release.yml']
     tags: ['v*']
   pull_request:
   workflow_dispatch:
