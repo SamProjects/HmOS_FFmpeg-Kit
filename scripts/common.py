@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import tarfile
 import urllib.request
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 WORK = ROOT / 'work'
@@ -33,9 +34,17 @@ def download(url, path, expected=None):
         raise ValueError('HTTPS required')
     temp = path.with_suffix(path.suffix + '.part')
     try:
-        with urllib.request.urlopen(url, timeout=120) as r, temp.open('wb') as f:
-            import shutil
-            shutil.copyfileobj(r, f)
+        for attempt in range(4):
+            try:
+                print(f'Download {url} (attempt {attempt + 1})', flush=True)
+                request = urllib.request.Request(url, headers={'User-Agent':'HmOS-FFmpeg-Kit/0.1'})
+                with urllib.request.urlopen(request, timeout=120) as r, temp.open('wb') as f:
+                    import shutil
+                    shutil.copyfileobj(r, f)
+                break
+            except (OSError, TimeoutError):
+                if attempt == 3: raise
+                time.sleep(2 ** attempt)
         if expected and digest(temp) != expected:
             raise ValueError(f'Checksum mismatch: {path.name}')
         temp.replace(path)

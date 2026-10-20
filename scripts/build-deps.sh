@@ -17,9 +17,12 @@ cmake -S "$ROOT/work/src/mbedtls" -B "$BUILD/mbedtls" -G Ninja "${cmake_args[@]}
   -DENABLE_TESTING=OFF -DENABLE_PROGRAMS=OFF -DUSE_SHARED_MBEDTLS_LIBRARY=OFF
 cmake --build "$BUILD/mbedtls" --parallel "${JOBS:-4}"
 cmake --install "$BUILD/mbedtls"
-cmake -S "$ROOT/work/src/zlib" -B "$BUILD/zlib" -G Ninja "${cmake_args[@]}" -DZLIB_BUILD_EXAMPLES=OFF
-cmake --build "$BUILD/zlib" --parallel "${JOBS:-4}"
-cmake --install "$BUILD/zlib"
+mkdir -p "$BUILD/zlib"
+( cd "$BUILD/zlib"
+  CHOST=aarch64-linux-ohos CFLAGS=-fPIC "$ROOT/work/src/zlib/configure" --static --prefix="$PREFIX"
+  make -j"${JOBS:-4}"
+  make install
+)
 mkdir -p "$BUILD/lame" "$BUILD/vpx"
 ( cd "$BUILD/lame"
   "$ROOT/work/src/lame/configure" --host=aarch64-linux --prefix="$PREFIX" \
