@@ -8,7 +8,9 @@ BUILD = WORK / 'build' / PROFILE
 PREFIX = WORK / 'prefix' / PROFILE
 SDK = Path(os.environ.get('OHOS_NATIVE', '.'))
 READELF = SDK / 'llvm/bin/llvm-readelf'
-SYSTEM = {'libc.so', 'libm.so', 'libdl.so', 'libpthread.so', 'librt.so', 'libace_napi.z.so', 'libc++_shared.so', 'libhilog_ndk.z.so'}
+# The SDK toolchain injects deviceinfo for OHOS_COMPATIBLE_SDK_VERSION;
+# deviceinfo.h declares it as a system library available since API 10.
+SYSTEM = {'libc.so', 'libm.so', 'libdl.so', 'libpthread.so', 'librt.so', 'libace_napi.z.so', 'libc++_shared.so', 'libhilog_ndk.z.so', 'libdeviceinfo_ndk.z.so'}
 
 
 def inspect(files, report):
