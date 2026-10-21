@@ -1,5 +1,5 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "ffmpeg": "9.0.2",
   "abi": "arm64-v8a",
   "abis": [

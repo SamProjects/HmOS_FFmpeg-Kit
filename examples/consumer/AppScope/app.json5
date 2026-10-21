@@ -2,8 +2,8 @@
   "app": {
     "bundleName": "com.samprojects.ffmpegsmoke",
     "vendor": "SamProjects",
-    "versionCode": 10004,
-    "versionName": "1.0.2-codec-test3",
+    "versionCode": 10005,
+    "versionName": "1.0.4-timeout-test",
     "icon": "$media:app_icon",
     "label": "$string:app_name"
   }

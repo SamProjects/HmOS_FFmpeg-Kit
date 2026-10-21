@@ -42,6 +42,7 @@ export class FFmpeg {
     return { id, result };
   }
   // Experimental command-test HAR only. Arguments exclude the executable name.
+  // timeoutSeconds: integer 0..2147483647; 0 disables total timeout. Default: 300.
   static execute(args: string[], timeoutSeconds: number = 300): CommandSession {
     const id = ++FFmpeg.sequence;
     const result = native.execute(id, args, timeoutSeconds).then((value: string): CommandResult => {

@@ -11,7 +11,7 @@ import tarfile
 import tempfile
 import zipfile
 
-from common import ROOT, WORK, DIST
+from common import ROOT, WORK, DIST, PROJECT
 from hap_validation import validate_hap
 
 
@@ -39,7 +39,7 @@ def inspect_har(har):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--har', type=Path,
-                        default=DIST / 'assets/hmos-ffmpeg-1.0.2-extended-all-command-test.har')
+                        default=DIST / f'assets/hmos-ffmpeg-{PROJECT["version"]}-extended-all-command-test.har')
     parser.add_argument('--tools', type=Path, default=Path(os.environ.get(
         'HARMONY_TOOLS', str(WORK / 'sdk/command-line-tools'))))
     parser.add_argument('--video', type=Path, required=True, help='Private local input video, embedded only in generated artifacts')

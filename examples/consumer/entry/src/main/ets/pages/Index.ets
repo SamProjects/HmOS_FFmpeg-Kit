@@ -28,7 +28,7 @@ struct Index {
   @State available: boolean = false;
   @State running: boolean = false;
   @State completed: number = 0;
-  @State total: number = 97;
+  @State total: number = 101;
   @State passed: number = 0;
   @State failed: number = 0;
   @State unsupported: number = 0;
@@ -42,7 +42,7 @@ struct Index {
   aboutToAppear(): void {
     try {
       const info = FFmpeg.getBuildInfo();
-      this.version = 'FFmpeg ' + info.version + ' · 扩展编解码测试 v3';
+      this.version = 'FFmpeg ' + info.version + ' · 总超时测试 v4';
       const caps = FFmpeg.getCapabilities();
       this.catalog = info.license + ' · 编码器 ' + caps.encoders.length + ' · 解码器 ' + caps.decoders.length;
       this.available = info.commandExecution === 'experimental-serial';

@@ -108,6 +108,10 @@ def cases():
         add(label+' 转码中取消', ['-y','-re','-stream_loop','-1','-i','{VIDEO}','-t','60','-vf','scale=128:128','-an','-c:v',codec,'-threads','1',*options,'{DIR}/cancel-codec.mkv'],expected='cancel',cancelMs=700)
         add(label+' 取消后恢复', ['-version'])
     add('扩展编码后恢复及日志隔离', ['-version'])
+    add('关闭总超时后完成转码', ['-y','-re','-i','{VIDEO}','-t','2','-an','-c:v','mpeg4','{DIR}/no-timeout.mp4'], '{DIR}/no-timeout.mp4', timeout=0, videoCodec='mpeg4', minDuration=1.9, verifyDecode=True)
+    add('关闭总超时后手动取消', ['-y','-re','-stream_loop','-1','-i','{VIDEO}','-t','60','-an','-c:v','mpeg4','{DIR}/no-timeout-cancel.mp4'], expected='cancel', timeout=0, cancelMs=700)
+    add('关闭总超时取消后恢复', ['-version'], timeout=0)
+    add('允许超过一小时的总超时参数', ['-version'], timeout=7200)
     return result
 
 if __name__ == '__main__':

@@ -69,7 +69,7 @@
         "libavformat-63.so": "135dd6148383490fae5823ef8efc841e1900b491735b586e909215ad10e11b29",
         "libswscale-10.so": "2bc201e9a0ef10c74c6b3e02c074260c73d0e8d51ae46804e3ea45b9acd7c3b2",
         "libavfilter-12.so": "57544a3035cae6f8a3c870257ab5233181975ab1c88e9e5bed310bf675fe2a74",
-        "libhmosffmpeg.so": "ec622bfd05e5f4e3c0f8e68ed74a0c6146990ead3546031a94f2662bc3368863",
+        "libhmosffmpeg.so": "e6f27096c0e6248c76a5f852dd3669a2263d1e5a6a5607d0fe6547d3b6ba7fbd",
         "libswresample-7.so": "fa538397033c115bf297af96e00b1a15a5e567922f665c77485c5baf79b23e6b",
         "libhmosffmpegcmd.so": "ac4cc488d092c11e8478f1daf560b781a95efd256676bf870d6d8716c45de53a"
       }
@@ -135,10 +135,11 @@
         "libavformat-63.so": "5633add2c5b3234b1cf84709a831fd9593f4dcb769c477f465031a858585de37",
         "libswscale-10.so": "202f73c57536776ad3485593438b87f634ba7aa70276aaf82897b6869adf249d",
         "libavfilter-12.so": "3d8a745daa5a3a153e04fc8ad648c397f1a0e4e397d1b9127d8a44526148badb",
-        "libhmosffmpeg.so": "46d6e6a315a62439a15d4071b69cd1973296433ba86a8d3089992967fbd9c830",
+        "libhmosffmpeg.so": "a8a6ea9ab1e8b6d42c57ef0ff4a614f3c334538af00d7cded45917f800fcc85a",
         "libswresample-7.so": "b0eaafea60fe502ff73574e109934c8091ebb1b62f5db113e97f42a7c9b9850f",
         "libhmosffmpegcmd.so": "1a87f3e097d3987db8a12172705bdd9b3e99fecc6f60ab0b43e65b874c48a5c2"
       }
     }
-  }
+  },
+  "kitVersion": "1.0.4"
 }

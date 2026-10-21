@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "command_timeout.h"
 #include <napi/native_api.h>
 #include <map>
 #include <memory>
@@ -49,8 +50,9 @@ napi_value start(napi_env env, napi_callback_info info) {
                 total += task->commandArguments.back().size();
                 if(total > 1024 * 1024) throw std::runtime_error("Command too large");
             }
-            ok(napi_get_value_int32(env, argv[2], &task->timeoutSeconds));
-            if(task->timeoutSeconds < 1 || task->timeoutSeconds > 3600) throw std::runtime_error("Timeout must be 1 to 3600 seconds");
+            double timeout;
+            ok(napi_get_value_double(env, argv[2], &timeout));
+            task->timeoutSeconds = hmosffmpeg::commandTimeoutSeconds(timeout);
             task->operation = "command";
 #ifndef HMOS_COMMAND_TEST
             throw std::runtime_error("This HAR was built without the experimental command engine");

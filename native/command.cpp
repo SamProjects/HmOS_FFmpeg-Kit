@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "command_timeout.h"
 #include <chrono>
 #include <mutex>
 #include <sstream>
@@ -12,7 +13,7 @@ namespace hmosffmpeg {
 namespace {
 struct Context {
     Task& task;
-    std::chrono::steady_clock::time_point deadline;
+    CommandDeadline deadline;
 };
 std::string json(const std::string& value) {
     std::ostringstream out;
@@ -37,7 +38,7 @@ std::string executeCommand(Task& task) {
     throw std::runtime_error("Command execution requires the experimental command-test HAR");
 #else
     if (task.cancelled) return "{\"exitCode\":255,\"cancelled\":true,\"timedOut\":false,\"logs\":\"\",\"logsTruncated\":false}";
-    Context context{task, std::chrono::steady_clock::now() + std::chrono::seconds(task.timeoutSeconds)};
+    Context context{task, CommandDeadline(task.timeoutSeconds)};
     std::vector<std::string> values{"ffmpeg", "-nostdin", "-nostats"};
     for (const auto& value : task.commandArguments) {
         if (value == "-stdin" || value == "-report" || value == "-timelimit" ||
@@ -52,7 +53,7 @@ std::string executeCommand(Task& task) {
     argv.push_back(nullptr);
     int code = hmos_command_run(static_cast<int>(values.size()), argv.data(),
         [](void* p) -> int { auto& c = *static_cast<Context*>(p);
-            return c.task.cancelled || std::chrono::steady_clock::now() >= c.deadline; },
+            return c.task.cancelled || c.deadline.expired(); },
         [](void* p, int64_t pts) { if (pts >= 0) static_cast<Context*>(p)->task.processedUs = pts; },
         [](void* p, const char* message) { auto& c = *static_cast<Context*>(p);
             std::lock_guard<std::mutex> lock(c.task.logMutex);
@@ -66,7 +67,7 @@ std::string executeCommand(Task& task) {
             if (size > remaining) c.task.logsTruncated = true;
         }, &context);
     if (code == -16) throw std::runtime_error("Another command is running");
-    bool timedOut = std::chrono::steady_clock::now() >= context.deadline;
+    bool timedOut = context.deadline.expired();
     return "{\"exitCode\":" + std::to_string(code) + ",\"cancelled\":" + (task.cancelled ? "true" : "false")
         + ",\"timedOut\":" + (timedOut ? "true" : "false") + ",\"logs\":" + json(task.commandLogs)
         + ",\"logsTruncated\":" + (task.logsTruncated ? "true" : "false") + '}';
