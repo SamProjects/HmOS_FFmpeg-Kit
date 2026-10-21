@@ -75,6 +75,7 @@ if universal:
     assets = DIST / 'assets'
     assets.mkdir(exist_ok=True)
     shutil.copy2(output, assets / output.name)
-    write_json(assets / (base + '-consumer-validation.json'), report)
-    for name in [output.name, base + '-consumer-validation.json']:
-        (assets / (name + '.sha256')).write_text(digest(assets / name) + '  ' + name + '\n')
+    if not HAR_ONLY:
+        write_json(assets / (base + '-consumer-validation.json'), report)
+        for name in [output.name, base + '-consumer-validation.json']:
+            (assets / (name + '.sha256')).write_text(digest(assets / name) + '  ' + name + '\n')

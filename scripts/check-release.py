@@ -12,7 +12,45 @@ def check_asset(directory, name):
     return path
 
 
+def validate_har_only(directory):
+    directory = Path(directory)
+    base = f'hmos-ffmpeg-{PROJECT["version"]}-extended-all'
+    har = directory / (base + '.har')
+    if set(directory.iterdir()) != {har} or not har.is_file() or har.stat().st_size == 0:
+        raise ValueError('Expected only the extended universal HAR')
+    report = json.loads((directory.parent / 'extended-all/consumer-validation.json').read_text())
+    if not report['consumerHapBuilt'] or report['harSha256'] != digest(har):
+        raise ValueError('Universal HAR evidence mismatch')
+    expected = {tuple([abi]) for abi in PROJECT['abis']} | {tuple(PROJECT['abis'])}
+    if len(report['selections']) != len(expected) or {tuple(r['selectedAbis']) for r in report['selections']} != expected:
+        raise ValueError('Incomplete universal consumer matrix')
+    for r in report['selections']:
+        if r['packagedAbis'] != sorted(r['selectedAbis']) or r['libraryCount'] != 9 * len(r['selectedAbis']):
+            raise ValueError('Consumer contains wrong architecture/library count')
+    libraries = {}
+    for abi in PROJECT['abis']:
+        manifest = json.loads((directory.parent / profile_key('extended', abi) / 'manifest.json').read_text())
+        if manifest['profile'] != 'extended' or manifest['project'] != PROJECT or manifest['abi'] != abi:
+            raise ValueError('Wrong profile/version/ABI')
+        if os.environ.get('GITHUB_SHA') and manifest['commit'] != os.environ['GITHUB_SHA']:
+            raise ValueError('Artifact commit mismatch')
+        if len(manifest['libraries']) != 9 or not all(manifest['validation'][g] for g in ['sourceIntegrity', 'licenseConfig', 'elfClosure']):
+            raise ValueError('Build gates did not pass')
+        libraries.update({f'libs/{abi}/{name}':sha for name,sha in manifest['libraries'].items()})
+    with tarfile.open(har) as t:
+        members = {m.name.removeprefix('./').removeprefix('package/'):m for m in t.getmembers()}
+        actual = {name for name in members if name.startswith('libs/') and name.endswith('.so')}
+        if actual != set(libraries) or 'Index.ets' not in members:
+            raise ValueError('HAR ABI/library closure or ArkTS entry mismatch')
+        for name, sha in libraries.items():
+            if hashlib.sha256(t.extractfile(members[name]).read()).hexdigest() != sha:
+                raise ValueError('HAR library changed: ' + name)
+    print('Extended universal HAR, both ABI build gates and three consumer selections verified')
+
+
 def validate(directory):
+    if HAR_ONLY:
+        return validate_har_only(directory)
     directory = Path(directory)
     for profile in ['core', 'extended']:
         for abi in PROJECT['abis']:

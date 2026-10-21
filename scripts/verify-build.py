@@ -60,5 +60,5 @@ if __name__ == '__main__':
     libs = list((PREFIX / 'lib').glob('lib*-*.so'))
     if len(libs) != 7:
         raise ValueError('Expected seven FFmpeg shared libraries')
-    files = libs + [PREFIX / 'bin' / p for p in ['ffmpeg','ffprobe']]
+    files = libs if HAR_ONLY else libs + [PREFIX / 'bin' / p for p in ['ffmpeg','ffprobe']]
     inspect(files, BUILD / 'elf.json')

@@ -95,6 +95,99 @@ class BuildToolsTests(unittest.TestCase):
             next(directory.glob('*.har')).write_bytes(b'modified')
             with self.assertRaises(ValueError): gate.validate(directory)
 
+    def test_har_only_staging_and_cleanup_need_no_cli_or_sdk_archive(self):
+        import common
+        import os
+        import runpy
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as d:
+            work = Path(d) / 'work'; dist = Path(d) / 'dist'; sdk = Path(d) / 'sdk'
+            build = work / 'build/extended'
+            prefix = work / 'prefix/extended'
+            (prefix / 'lib').mkdir(parents=True)
+            for i in range(7): (prefix / 'lib' / f'libcomponent{i}-1.so').write_bytes(b'ffmpeg')
+            (build / 'bridge').mkdir(parents=True)
+            (build / 'bridge/libhmosffmpeg.so').write_bytes(b'bridge')
+            cpp = sdk / 'llvm/lib/aarch64-linux-ohos/libc++_shared.so'
+            cpp.parent.mkdir(parents=True); cpp.write_bytes(b'cpp')
+            for name in SOURCES:
+                source = work / 'src' / name; source.mkdir(parents=True)
+                (source / 'LICENSE').write_text('test license')
+            def fake_run(args, **kw):
+                if str(args[0]).endswith('llvm-readelf'):
+                    return SimpleNamespace(stdout=f'ELF64 AArch64 (SONAME) [{Path(args[-1]).name}]')
+                self.assertTrue(str(args[0]).endswith('llvm-strip'))
+            with patch.multiple(common, WORK=work, DIST=dist, ABI='arm64-v8a', TRIPLE='aarch64-linux-ohos', HAR_ONLY=True), patch.object(common, 'run', side_effect=fake_run), patch.dict(os.environ, {'OHOS_NATIVE':str(sdk)}), patch.object(sys, 'argv', ['test', 'extended']):
+                runpy.run_path(str(ROOT / 'scripts/package.py'), run_name='__main__')
+                package = dist / 'extended'
+                self.assertEqual(len(list((package / 'runtime/arm64-v8a').glob('*.so'))), 9)
+                for name in ['bin', 'sdk', 'symbols', 'sbom.spdx.json']:
+                    self.assertFalse((package / name).exists())
+                self.assertFalse((work / 'har').exists())
+                runpy.run_path(str(ROOT / 'scripts/cleanup-profile.py'), run_name='__main__')
+                self.assertFalse(build.exists()); self.assertFalse(prefix.exists())
+                self.assertEqual({p.name for p in package.iterdir()}, {'runtime', 'licenses', 'manifest.json'})
+                self.assertTrue((package / 'licenses/project-MIT.txt').is_file())
+
+    def test_har_only_release_validates_single_asset_and_both_abis(self):
+        from unittest.mock import patch
+        import hashlib
+        import os
+        spec = importlib.util.spec_from_file_location('har_only_gate', ROOT / 'scripts/check-release.py')
+        gate = importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)
+        with tempfile.TemporaryDirectory() as d, patch.object(gate, 'HAR_ONLY', True), patch.dict(os.environ, {'GITHUB_SHA':'test-commit'}):
+            dist = Path(d)
+            assets = dist / 'assets'; assets.mkdir()
+            package = dist / 'extended-all'; package.mkdir()
+            har = assets / f'hmos-ffmpeg-{PROJECT["version"]}-extended-all.har'
+            entries = {'package/Index.ets': b'export {}'}
+            manifests = []
+            for abi in PROJECT['abis']:
+                libs = {f'lib{i}.so': (abi + str(i)).encode() for i in range(9)}
+                entries.update({f'package/libs/{abi}/{name}':blob for name,blob in libs.items()})
+                manifest = {'profile':'extended', 'project':PROJECT, 'abi':abi, 'commit':'test-commit',
+                            'validation':dict(sourceIntegrity=True, licenseConfig=True, elfClosure=True),
+                            'libraries':{name:hashlib.sha256(blob).hexdigest() for name,blob in libs.items()}}
+                location = dist / gate.profile_key('extended', abi) / 'manifest.json'
+                location.parent.mkdir(); location.write_text(json.dumps(manifest))
+                manifests.append(location)
+            def write_har():
+                with tarfile.open(har, 'w:gz') as t:
+                    for name, blob in entries.items():
+                        info = tarfile.TarInfo(name); info.size = len(blob)
+                        t.addfile(info, io.BytesIO(blob))
+            write_har()
+            original = har.read_bytes()
+            report = {'harSha256':digest(har), 'consumerHapBuilt':True,
+                      'selections':[{'selectedAbis':a, 'packagedAbis':sorted(a), 'libraryCount':9*len(a)}
+                                    for a in [[abi] for abi in PROJECT['abis']] + [PROJECT['abis']]]}
+            report_path = package / 'consumer-validation.json'
+            report_path.write_text(json.dumps(report))
+            gate.validate(assets)
+            extra = assets / 'unwanted-sdk.tar.gz'; extra.touch()
+            with self.assertRaises(ValueError): gate.validate(assets)
+            extra.unlink()
+            har.write_bytes(b'tampered')
+            with self.assertRaises(ValueError): gate.validate(assets)
+            har.write_bytes(original)
+            for change in ['commit', 'validation']:
+                manifest = json.loads(manifests[0].read_text())
+                changed = dict(manifest)
+                changed[change] = 'wrong-commit' if change == 'commit' else dict(sourceIntegrity=True, licenseConfig=False, elfClosure=True)
+                manifests[0].write_text(json.dumps(changed))
+                with self.assertRaises(ValueError): gate.validate(assets)
+                manifests[0].write_text(json.dumps(manifest))
+            # Even a matching HAR digest must not hide a missing architecture.
+            entries.pop(f'package/libs/{PROJECT["abis"][-1]}/lib0.so')
+            write_har(); report['harSha256'] = digest(har)
+            report_path.write_text(json.dumps(report))
+            with self.assertRaises(ValueError): gate.validate(assets)
+            har.write_bytes(original); report['harSha256'] = digest(har)
+            report['selections'].pop()
+            report_path.write_text(json.dumps(report))
+            with self.assertRaises(ValueError): gate.validate(assets)
+
     def test_hap_rejects_unwanted_abi_missing_or_changed_library(self):
         from hap_validation import validate_hap
         import hashlib

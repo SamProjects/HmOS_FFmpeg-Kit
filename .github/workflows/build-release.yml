@@ -47,7 +47,9 @@ jobs:
   build-release:
     needs: [verify, media-test]
     runs-on: ubuntu-24.04
-    timeout-minutes: 180
+    timeout-minutes: 120
+    env:
+      HMOS_HAR_ONLY: "1"
     permissions:
       contents: write
     steps:
@@ -63,43 +65,21 @@ jobs:
         run: bash scripts/install-ci-deps.sh build
       - name: Prepare pinned HarmonyOS SDK
         run: python3 scripts/setup-sdk.py
-      - name: Build core ARM64 SDK and HAR
-        env:
-          HMOS_ABI: arm64-v8a
-        run: |
-          bash scripts/build-ohos.sh core
-          python3 scripts/build-har.py core
-          python3 scripts/release-assets.py core
-          python3 scripts/cleanup-profile.py core
-      - name: Build core x86_64 SDK and HAR
-        env:
-          HMOS_ABI: x86_64
-        run: |
-          bash scripts/build-ohos.sh core
-          python3 scripts/build-har.py core
-          python3 scripts/release-assets.py core
-          python3 scripts/cleanup-profile.py core
-      - name: Build core universal HAR and validate three consumer ABI selections
-        run: python3 scripts/build-har.py core --universal
-      - name: Build extended ARM64 SDK and HAR
+      - name: 编译 extended ARM64 运行库
         env:
           HMOS_ABI: arm64-v8a
         run: |
           bash scripts/build-ohos.sh extended
-          python3 scripts/build-har.py extended
-          python3 scripts/release-assets.py extended
           python3 scripts/cleanup-profile.py extended
-      - name: Build extended x86_64 SDK and HAR
+      - name: 编译 extended x86_64 运行库
         env:
           HMOS_ABI: x86_64
         run: |
           bash scripts/build-ohos.sh extended
-          python3 scripts/build-har.py extended
-          python3 scripts/release-assets.py extended
           python3 scripts/cleanup-profile.py extended
-      - name: Build extended universal HAR and validate three consumer ABI selections
+      - name: 生成 extended 全架构 HAR 并验证消费工程
         run: python3 scripts/build-har.py extended --universal
-      - name: Verify both release packages
+      - name: 校验唯一发布的全架构 HAR
         run: python3 scripts/check-release.py dist/assets
       - name: Publish directly from this runner to Release
         if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.publish)

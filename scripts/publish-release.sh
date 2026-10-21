@@ -7,7 +7,10 @@ git fetch --no-tags origin "refs/tags/$RELEASE_TAG"
 [[ $(git rev-parse 'FETCH_HEAD^{commit}') == "$GITHUB_SHA" ]] || {
   echo '发布标签已变化，与构建提交不一致。'; exit 1;
 }
-(cd dist/assets; sha256sum *.har *.tar.gz *.json > SHA256SUMS)
+python3 scripts/check-release.py dist/assets
+if [[ "${HMOS_HAR_ONLY:-0}" != 1 ]]; then
+  (cd dist/assets; sha256sum *.har *.tar.gz *.json > SHA256SUMS)
+fi
 # Only a draft prepared for this exact source may receive files.
 draft=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
 [[ "$draft" == true ]] || { echo '拒绝覆盖已发布版本。'; exit 1; }

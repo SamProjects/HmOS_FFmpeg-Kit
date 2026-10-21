@@ -44,7 +44,7 @@ if [[ "$PROFILE" == extended ]]; then
   if ! bash scripts/build-deps.sh "$BUILD/deps" "$PREFIX" > "$BUILD/deps.log" 2>&1; then
     tail -n 120 "$BUILD/deps.log"; exit 1
   fi
-  echo "第三方依赖编译完成：$PROFILE $ABI（完整日志随 SDK 归档）"
+  echo "第三方依赖编译完成：$PROFILE $ABI（失败时输出日志摘要）"
   extra+=(--enable-libopus --enable-libvpx --enable-libmp3lame --enable-zlib --enable-mbedtls)
 fi
 mkdir "$BUILD/ffmpeg"
@@ -56,12 +56,17 @@ args=("--prefix=$PREFIX" --target-os=linux "--arch=$ARCH" "--cpu=$CPU"
   "--nm=$SDK/llvm/bin/llvm-nm" "--strip=$SDK/llvm/bin/llvm-strip"
   --enable-shared --disable-static --enable-pic --disable-stripping
   --enable-version3 --disable-gpl --disable-nonfree --disable-autodetect
-  --enable-ffmpeg --enable-ffprobe --disable-ffplay --disable-doc
+  --disable-ffplay --disable-doc
   --enable-network --enable-pthreads --disable-linux-perf
   --disable-indevs --disable-outdevs
   "--extra-cflags=-O2 -g -fPIC -march=$MARCH -I$PREFIX/include"
   "--extra-ldflags=-fuse-ld=lld -L$PREFIX/lib -Wl,-z,relro,-z,now,--build-id=sha1"
   --extra-ldexeflags=-pie "${extra[@]}")
+if [[ "${HMOS_HAR_ONLY:-0}" == 1 ]]; then
+  args+=(--disable-programs)
+else
+  args+=(--enable-ffmpeg --enable-ffprobe)
+fi
 printf '%s\n' "${args[@]}" > configure-args.txt
 if ! bash "$ROOT/work/src/ffmpeg/configure" "${args[@]}" > configure.log 2>&1; then
   tail -n 120 configure.log; exit 1
@@ -72,7 +77,7 @@ names=('SLIBNAME_WITH_MAJOR=$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
        'SLIBNAME_WITH_VERSION=$(SLIBNAME_WITH_MAJOR)'
        'SLIB_INSTALL_NAME=$(SLIBNAME_WITH_MAJOR)'
        'SLIB_INSTALL_LINKS=$(SLIBNAME)')
-echo "开始 FFmpeg 编译：$PROFILE $ABI（完整命令写入 SDK 中的 build.log）"
+echo "开始 FFmpeg 编译：$PROFILE $ABI（完整命令写入临时 build.log）"
 if ! make -j"${JOBS:-4}" V=1 "${names[@]}" > build.log 2>&1; then
   tail -n 120 build.log; exit 1
 fi
