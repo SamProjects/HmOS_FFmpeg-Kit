@@ -8,7 +8,7 @@ FFmpeg Kit v1.0.4：包含命令执行接口和扩展音视频编解码器的 Ha
 
 ## 总超时修复
 
-`FFmpeg.execute(args, 0)` 关闭总超时；正整数可设置至 2147483647 秒，默认值仍为 300 秒。取消原先 3600 秒上限，手动取消保持可用。拒绝负数、小数、非有限数和越界值，避免 int32 转换截断或回绕。已发布 v1.0.3 不具备此能力，必须更换新 HAR。
+`FFmpeg.execute(args)` 默认不设置总超时，传 `0` 也表示不设置总超时；仅显式传入正整数时启用，可设置至 2147483647 秒。取消原先 3600 秒上限，手动取消保持可用。拒绝负数、小数、非有限数和越界值，避免 int32 转换截断或回绕。已发布 v1.0.3 不具备此能力，必须更换新 HAR。
 
 ## 命令调用
 
@@ -17,7 +17,7 @@ import { FFmpeg } from '@samprojects/hmos-ffmpeg';
 const task = FFmpeg.execute([
   '-y', '-i', inputPath,
   '-c:v', 'libopenh264', '-c:a', 'aac', outputPath
-], 300);
+]);
 const result = await task.result;
 console.info(result.logs);
 ```

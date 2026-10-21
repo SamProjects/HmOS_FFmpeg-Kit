@@ -13,7 +13,7 @@ import { FFmpeg } from '@samprojects/hmos-ffmpeg';
 const task = FFmpeg.execute([
   '-y', '-i', inputPath,
   '-c:v', 'mpeg4', '-c:a', 'aac', outputPath
-], 300);
+]);
 const result = await task.result;
 console.info(`exitCode=${result.exitCode}, cancelled=${result.cancelled}`);
 console.info(result.logs);
@@ -21,7 +21,7 @@ console.info(result.logs);
 
 `task.result` 返回 `{ exitCode, cancelled, timedOut, logs, logsTruncated }`。FFmpeg 命令失败通过非零 exitCode 表达；接口参数错误、引擎未启用或已有任务运行时抛出异常。调用方需要同时处理两种情况。
 
-运行期间可调用 `FFmpeg.cancel(task.id)`；`FFmpeg.progressUs(task.id)` 返回最近的媒体时间戳（微秒），不是百分比，也不保证等于输出时长。默认总超时仍为 300 秒。v1.0.4 支持 `timeoutSeconds=0` 关闭总超时，正整数可设置到 2147483647 秒，取消原有 3600 秒上限；负数、小数、NaN、Infinity 和超范围值拒绝。此变更需使用重编译的新 HAR，已发布 v1.0.3 不支持。关闭总超时不关闭 `FFmpeg.cancel(task.id)`，也不绕过操作系统后台限制或 FFmpeg 自身协议超时。阻塞 I/O 的取消依赖 FFmpeg 协议实现响应中断，不能保证所有第三方协议均立即退出。
+运行期间可调用 `FFmpeg.cancel(task.id)`；`FFmpeg.progressUs(task.id)` 返回最近的媒体时间戳（微秒），不是百分比，也不保证等于输出时长。v1.0.4 默认不设置总超时；省略超时参数或传 `timeoutSeconds=0` 均可持续执行，直到完成、报错或被取消。仅调用方显式传入正整数时启用总超时，正整数可设置到 2147483647 秒，取消原有 3600 秒上限；负数、小数、NaN、Infinity 和超范围值拒绝。此变更需使用重编译的新 HAR，已发布 v1.0.3 不支持。关闭总超时不关闭 `FFmpeg.cancel(task.id)`，也不绕过操作系统后台限制或 FFmpeg 自身协议超时。阻塞 I/O 的取消依赖 FFmpeg 协议实现响应中断，不能保证所有第三方协议均立即退出。
 
 ## 手机测试工程
 
