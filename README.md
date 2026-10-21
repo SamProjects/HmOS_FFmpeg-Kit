@@ -6,6 +6,8 @@
 
 需要执行 FFmpeg 参数命令时，可显式构建 [命令执行实验版](docs/COMMAND-TEST.zh-CN.md)。该版本新增 `FFmpeg.execute(args)`，命令组件使用已记录差异的 fftools 适配，属于上述零补丁约束的实验例外；当前尚未完成鸿蒙手机运行验证。 可使用 [测试 App](docs/TEST-APP.zh-CN.md) 在 DevEco 本地模拟器执行一键自检。
 
+extended 编解码器扩充、实际实现与许可边界见 [编解码器说明](docs/CODECS.zh-CN.md)。
+
 ## 下载与使用
 
 从 [Releases](https://github.com/SamProjects/HmOS_FFmpeg-Kit/releases) 下载 extended HAR，放到鸿蒙工程 entry/libs，通过模块 oh-package.json5 的本地依赖导入，安装后即可调用：

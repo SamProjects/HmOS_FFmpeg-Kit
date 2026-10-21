@@ -48,15 +48,27 @@ def license_gate():
     args = (BUILD / 'ffmpeg/configure-args.txt').read_text().splitlines()
     if set(args) & {'--enable-gpl', '--enable-nonfree'}:
         raise ValueError('Prohibited configuration')
-    approved = {'LGPL-3.0-or-later','LGPL-2.0-or-later','BSD-3-Clause','BSD-2-Clause','Apache-2.0','Zlib'}
+    approved = {'LGPL-3.0-or-later','LGPL-2.0-or-later','BSD-3-Clause','BSD-2-Clause','Apache-2.0','Zlib','MIT','ISC','LGPL-2.1-or-later',
+                'BSD-3-Clause-Clear','TU-Berlin-2.0','AOMPL-1.0'}
     for name, lock in SOURCES.items():
-        if lock['license'] not in approved:
+        if any(term not in approved for term in lock['license'].split(' AND ')):
             raise ValueError('Unapproved dependency: ' + name)
     write_json(BUILD / 'license-gate.json', {'passed': True, 'license': 'LGPL-3.0-or-later', 'profile': PROFILE, 'sources': SOURCES})
 
 
+def codec_gate():
+    if PROFILE != 'extended': return
+    config = (BUILD / 'ffmpeg/config_components.h').read_text()
+    dependencies = json.loads((ROOT / 'config/codec-dependencies.json').read_text())
+    required = [name for dep in dependencies.values() for name in dep['requiredComponents']]
+    missing = [name for name in required if not re.search(r'^#define CONFIG_' + re.escape(name) + r' 1$', config, re.M)]
+    if missing: raise ValueError('Required external codecs missing: ' + ', '.join(missing))
+    write_json(BUILD / 'codec-gate.json', {'passed':True, 'requiredComponents':required})
+
+
 if __name__ == '__main__':
     license_gate()
+    codec_gate()
     libs = list((PREFIX / 'lib').glob('lib*-*.so'))
     if len(libs) != 7:
         raise ValueError('Expected seven FFmpeg shared libraries')

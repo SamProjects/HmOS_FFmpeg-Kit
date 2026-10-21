@@ -44,6 +44,7 @@ def main():
         'HARMONY_TOOLS', str(WORK / 'sdk/command-line-tools'))))
     parser.add_argument('--video', type=Path, required=True, help='Private local input video, embedded only in generated artifacts')
     parser.add_argument('--output', type=Path, default=DIST / 'test-app')
+    parser.add_argument('--abi', choices=['arm64-v8a','x86_64'], help='Optional test HAP ABI; the input HAR remains universal')
     args = parser.parse_args()
     har, tools, output = args.har.resolve(), args.tools.resolve(), args.output.resolve()
     if not har.is_file() or not (tools / 'sdk').is_dir():
@@ -51,6 +52,7 @@ def main():
     if not args.video.is_file():
         parser.error('--video must point to an existing local media file')
     libraries = inspect_har(har)
+    selected = [args.abi] if args.abi else list(libraries)
     output.mkdir(parents=True, exist_ok=True)
     WORK.mkdir(exist_ok=True)
     env = os.environ.copy()
@@ -76,8 +78,8 @@ def main():
         shutil.copy2(har, project / 'entry/libs/hmos-ffmpeg.har')
         profile_path = project / 'entry/build-profile.json5'
         profile = json.loads(profile_path.read_text())
-        profile['buildOption']['externalNativeOptions']['abiFilters'] = list(libraries)
-        profile['buildOption']['nativeLib']['filter']['excludes'] = []
+        profile['buildOption']['externalNativeOptions']['abiFilters'] = selected
+        profile['buildOption']['nativeLib']['filter']['excludes'] = ['**/' + abi + '/**' for abi in libraries if abi not in selected]
         profile_path.write_text(json.dumps(profile, ensure_ascii=False, indent=2) + '\n')
         project_zip = output / 'ffmpeg-command-test-project.zip'
         with zipfile.ZipFile(project_zip, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
@@ -93,7 +95,7 @@ def main():
             raise ValueError('Expected exactly one unsigned emulator HAP')
         hap = output / 'ffmpeg-command-test-emulator-unsigned.hap'
         shutil.copy2(candidates[0], hap)
-        validation = validate_hap(hap, libraries, list(libraries))
+        validation = validate_hap(hap, libraries, selected)
         with zipfile.ZipFile(hap) as archive:
             if archive.testzip() is not None:
                 raise ValueError('Invalid HAP ZIP')
@@ -110,7 +112,7 @@ def main():
                   'bundleName':module['app']['bundleName'], 'signed':False,
                   'target':'DevEco local emulator permitting unsigned development HAPs',
                   'installedOrExecuted':False, 'nativeLibrariesMatchHar':True,
-                  'validation':validation, 'videoFixtures':fixture_manifest}
+                  'validation':validation, 'videoFixtures':fixture_manifest, 'selectedAbis':selected, 'testCaseCount':len(json.loads((raw / 'command-cases.json').read_text()))}
         (output / 'validation.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n')
         shutil.copy2(ROOT / 'docs/TEST-APP.zh-CN.md', output / 'README.zh-CN.md')
         print(json.dumps(record, ensure_ascii=False, indent=2))

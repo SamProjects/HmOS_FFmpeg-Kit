@@ -1,0 +1,2710 @@
+{
+  "scope": "Linux in-process FFmpeg 9.0.2 adapter; selected codecs match test cases; not HarmonyOS device execution",
+  "harmonyDeviceTested": false,
+  "commandCalls": 137,
+  "outputDecodeCalls": 40,
+  "outputMetadataMethod": "same native engine.probe with pinned FFmpeg 9.0.2",
+  "cases": [
+    {
+      "id": "01",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "版本及日志",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "02",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "编码器列表及长日志",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 5076,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "03",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "解码器列表",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 5365,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "04",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "滤镜列表",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4541,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "05",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "非法参数及错误日志",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2743,
+      "exitCode": -1414549496,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "06",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "非法参数后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "07",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "输入文件不存在",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2832,
+      "exitCode": -2,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "08",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "不存在的编码器",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 3576,
+      "exitCode": -1129203192,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "09",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "非法滤镜",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 3556,
+      "exitCode": -1279870712,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "10",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "错误后再次恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "11",
+      "elapsedMs": 455,
+      "liveReads": 22,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 300141134,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "av1",
+            "type": "video",
+            "width": 426,
+            "height": 240,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 44100,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "原片 AV1 全片重封装",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4551,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "12",
+      "elapsedMs": 23,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "matroska,webm",
+        "durationUs": 3018000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "av1",
+            "type": "video",
+            "width": 426,
+            "height": 240,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 44100,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "原片 AV1 片段复制",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4554,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "13",
+      "elapsedMs": 21,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3018594,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 44100,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "原片音频无损提取",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4176,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "14",
+      "elapsedMs": 42,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "wav",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "pcm_s16le",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 16000,
+            "channels": 1
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "原片音频转 PCM 16k 单声道",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4250,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "15",
+      "elapsedMs": 102,
+      "liveReads": 5,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 44100,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "原片音频重新编码 AAC",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4249,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "16",
+      "elapsedMs": 40,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "原片 AV1 实际解码能力",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4310,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "17",
+      "elapsedMs": 21,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "matroska,webm",
+        "durationUs": 3029000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "兼容素材重封装 MKV",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4350,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "18",
+      "elapsedMs": 145,
+      "liveReads": 7,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "MPEG4 视频和 AAC 音频转码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4540,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "19",
+      "elapsedMs": 61,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "缩放 160x90",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4264,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "20",
+      "elapsedMs": 61,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 160,
+            "height": 120,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "裁剪 160x120",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4263,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "21",
+      "elapsedMs": 81,
+      "liveReads": 4,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 180,
+            "height": 320,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "旋转 90 度",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4267,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "22",
+      "elapsedMs": 62,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "降低帧率到 10fps",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4263,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "23",
+      "elapsedMs": 82,
+      "liveReads": 4,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "灰度滤镜",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4265,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "24",
+      "elapsedMs": 81,
+      "liveReads": 4,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "水平翻转",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4265,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "25",
+      "elapsedMs": 124,
+      "liveReads": 6,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "复合滤镜与显式映射",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4457,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "26",
+      "elapsedMs": 43,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "image2",
+        "durationUs": 40000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "png",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "截取 PNG 单帧",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4458,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "27",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "image2",
+        "durationUs": 40000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mjpeg",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "截取 JPEG 单帧",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4223,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "28",
+      "elapsedMs": 35,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "wav",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "pcm_s16le",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "音频转 WAV 48k 双声道",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4089,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "29",
+      "elapsedMs": 40,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "wav",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "pcm_s16le",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "音频音量滤镜",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4090,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "30",
+      "elapsedMs": 66,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "wav",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "pcm_s16le",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "音频加速 1.5 倍",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4089,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "31",
+      "elapsedMs": 21,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "视频去音轨",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4155,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "32",
+      "elapsedMs": 22,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3008000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "中文 空格 分号文件路径",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4360,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "33",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "拒绝覆盖已有输出",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 3602,
+      "exitCode": -17,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "34",
+      "elapsedMs": 21,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "matroska,webm",
+        "durationUs": 3029000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "覆盖失败后强制覆盖恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4350,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "35",
+      "elapsedMs": 2684,
+      "liveReads": 132,
+      "liveUpdates": 18,
+      "progressUs": 3000000,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "执行期间实时日志和进度",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 8102,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "36",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "立即取消",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 0,
+      "exitCode": 255,
+      "cancelled": true,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "37",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "立即取消后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "38",
+      "elapsedMs": 1044,
+      "liveReads": 51,
+      "liveUpdates": 6,
+      "progressUs": 960000,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "处理中取消",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 34902,
+      "exitCode": 255,
+      "cancelled": true,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "39",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "处理中取消后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "40",
+      "elapsedMs": 1029,
+      "liveReads": 50,
+      "liveUpdates": 7,
+      "progressUs": 960000,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "重复取消",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 66006,
+      "exitCode": 255,
+      "cancelled": true,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "41",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "重复取消后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "42",
+      "elapsedMs": 1033,
+      "liveReads": 51,
+      "liveUpdates": 1,
+      "progressUs": 1040000,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "超时中断",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4435,
+      "exitCode": 255,
+      "cancelled": false,
+      "timedOut": true,
+      "logsTruncated": false
+    },
+    {
+      "id": "43",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "超时后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "44",
+      "elapsedMs": 1540,
+      "liveReads": 76,
+      "liveUpdates": 1,
+      "progressUs": 1536000,
+      "busyRejected": true,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "执行期间拒绝并发调用",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4347,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "45",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "并发拒绝后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "46",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "Option requiring process-wide state or standard IO is disabled in this test API: -stdin",
+      "label": "拒绝进程级或标准IO参数 -stdin",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 0
+    },
+    {
+      "id": "47",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "Option requiring process-wide state or standard IO is disabled in this test API: -report",
+      "label": "拒绝进程级或标准IO参数 -report",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 0
+    },
+    {
+      "id": "48",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "Option requiring process-wide state or standard IO is disabled in this test API: -progress",
+      "label": "拒绝进程级或标准IO参数 -progress",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 0
+    },
+    {
+      "id": "49",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "Option requiring process-wide state or standard IO is disabled in this test API: pipe:1",
+      "label": "拒绝进程级或标准IO参数 pipe:1",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 0
+    },
+    {
+      "id": "50",
+      "elapsedMs": 82,
+      "liveReads": 4,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "连续转码状态复位 1/5",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4267,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "51",
+      "elapsedMs": 61,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "连续转码状态复位 2/5",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4267,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "52",
+      "elapsedMs": 61,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "连续转码状态复位 3/5",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4267,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "53",
+      "elapsedMs": 61,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "连续转码状态复位 4/5",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4267,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "54",
+      "elapsedMs": 61,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mpeg4",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "连续转码状态复位 5/5",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4267,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "55",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "非法流映射",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 3678,
+      "exitCode": -22,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "56",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "无法创建输出文件",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 3666,
+      "exitCode": -2,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "57",
+      "elapsedMs": 61,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "完整视频音频解码到空输出",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4407,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "58",
+      "elapsedMs": 40,
+      "liveReads": 2,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "静默日志级别",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 0,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "59",
+      "elapsedMs": 129,
+      "liveReads": 5,
+      "liveUpdates": 2,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "日志上限及截断标记",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 262144,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": true
+    },
+    {
+      "id": "60",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "长日志后恢复及日志隔离",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "61",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "运行时 LGPLv3 许可文本",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 3262,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "62",
+      "elapsedMs": 146,
+      "liveReads": 7,
+      "liveUpdates": 2,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "h264",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 44100,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "原片 AV1 软件解码并转 H264",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 5059,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "63",
+      "elapsedMs": 145,
+      "liveReads": 7,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "matroska,webm",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "hevc",
+            "type": "video",
+            "width": 128,
+            "height": 128,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "原片 AV1 软件解码并转 HEVC",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4307,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "64",
+      "elapsedMs": 61,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "matroska,webm",
+        "durationUs": 120000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "av1",
+            "type": "video",
+            "width": 128,
+            "height": 128,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "AV1 编码 libaom",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4338,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "65",
+      "elapsedMs": 42,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "matroska,webm",
+        "durationUs": 120000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "av1",
+            "type": "video",
+            "width": 128,
+            "height": 128,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "AV1 编码 SVT-AV1",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4160,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "66",
+      "elapsedMs": 124,
+      "liveReads": 6,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "h264",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          },
+          {
+            "index": 1,
+            "codec": "aac",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "H264 编码 OpenH264",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4843,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "67",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "matroska,webm",
+        "durationUs": 120000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "hevc",
+            "type": "video",
+            "width": 128,
+            "height": 128,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "HEVC 编码 Kvazaar",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4135,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "68",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "matroska,webm",
+        "durationUs": 120000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "vp8",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "VP8 编码 libvpx",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4343,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "69",
+      "elapsedMs": 41,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "matroska,webm",
+        "durationUs": 120000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "vp9",
+            "type": "video",
+            "width": 160,
+            "height": 90,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "VP9 编码 libvpx",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4314,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "70",
+      "elapsedMs": 96,
+      "liveReads": 4,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "vvc",
+        "durationUs": -9223372036854775808,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "vvc",
+            "type": "video",
+            "width": 128,
+            "height": 128,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "VVC 编码 VVenC",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4150,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "71",
+      "elapsedMs": 824,
+      "liveReads": 40,
+      "liveUpdates": 3,
+      "progressUs": 80000,
+      "busyRejected": false,
+      "media": {
+        "format": "evc",
+        "durationUs": -9223372036854775808,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "evc",
+            "type": "video",
+            "width": 128,
+            "height": 128,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "EVC 编码 XEVE 和解码 XEVD",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4131,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "72",
+      "elapsedMs": 81,
+      "liveReads": 4,
+      "liveUpdates": 1,
+      "progressUs": 120000,
+      "busyRejected": false,
+      "media": {
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationUs": 120000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "apv",
+            "type": "video",
+            "width": 128,
+            "height": 128,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "APV 专业视频编码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4158,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "73",
+      "elapsedMs": 21,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "ogg",
+        "durationUs": 120000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "theora",
+            "type": "video",
+            "width": 160,
+            "height": 96,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "Theora 编码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4250,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "74",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "image2",
+        "durationUs": 40000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "jpeg2000",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "JPEG2000 编码 OpenJPEG",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4143,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "75",
+      "elapsedMs": 43,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "image2",
+        "durationUs": 40000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "jpegxl",
+            "type": "video",
+            "width": 320,
+            "height": 180,
+            "sampleRate": 0,
+            "channels": 0
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "JPEG XL 编码与解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4466,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "76",
+      "elapsedMs": 143,
+      "liveReads": 7,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mp3",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mp3",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 44100,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "MP3 LAME 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4056,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "77",
+      "elapsedMs": 40,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mp3",
+        "durationUs": 2977959,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mp3",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 44100,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "MP3 Shine 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4091,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "78",
+      "elapsedMs": 62,
+      "liveReads": 3,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "mp3",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "mp2",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "MP2 TwoLAME 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4059,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "79",
+      "elapsedMs": 41,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "ogg",
+        "durationUs": 3006500,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "opus",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "Opus 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4145,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "80",
+      "elapsedMs": 183,
+      "liveReads": 9,
+      "liveUpdates": 2,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "ogg",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "vorbis",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 2
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "Vorbis 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4157,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "81",
+      "elapsedMs": 40,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "ogg",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "speex",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 16000,
+            "channels": 1
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "Speex 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4185,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "82",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "gsm",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "gsm",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 8000,
+            "channels": 1
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "GSM 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4041,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "83",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "wav",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "gsm_ms",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 8000,
+            "channels": 1
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "GSM WAV49 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4075,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "84",
+      "elapsedMs": 41,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "amr",
+        "durationUs": 3117375,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "amr_nb",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 8000,
+            "channels": 1
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "AMR-NB 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4069,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "85",
+      "elapsedMs": 40,
+      "liveReads": 2,
+      "liveUpdates": 1,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "amr",
+        "durationUs": 3093750,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "amr_wb",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 16000,
+            "channels": 1
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "AMR-WB 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4067,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "86",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "lc3",
+        "durationUs": 8000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "lc3",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 48000,
+            "channels": 1
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "LC3 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4101,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "87",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "ilbc",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "ilbc",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 8000,
+            "channels": 1
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "iLBC 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4047,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "88",
+      "elapsedMs": 21,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": {
+        "format": "codec2",
+        "durationUs": 3000000,
+        "streams": [
+          {
+            "index": 0,
+            "codec": "codec2",
+            "type": "audio",
+            "width": 0,
+            "height": 0,
+            "sampleRate": 8000,
+            "channels": 1
+          }
+        ]
+      },
+      "probeError": "",
+      "error": "",
+      "label": "Codec2 编码和解码",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 4057,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "89",
+      "elapsedMs": 1014,
+      "liveReads": 50,
+      "liveUpdates": 5,
+      "progressUs": 880000,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "H264 转码中取消",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 86455,
+      "exitCode": 255,
+      "cancelled": true,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "90",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "H264 取消后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "91",
+      "elapsedMs": 1014,
+      "liveReads": 50,
+      "liveUpdates": 5,
+      "progressUs": 200000,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "HEVC 转码中取消",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 72537,
+      "exitCode": 255,
+      "cancelled": true,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "92",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "HEVC 取消后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "93",
+      "elapsedMs": 1242,
+      "liveReads": 60,
+      "liveUpdates": 7,
+      "progressUs": 1480000,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "AV1 libaom 转码中取消",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 72684,
+      "exitCode": 255,
+      "cancelled": true,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "94",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "AV1 libaom 取消后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "95",
+      "elapsedMs": 1062,
+      "liveReads": 52,
+      "liveUpdates": 7,
+      "progressUs": 1440000,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "AV1 SVT 转码中取消",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 66985,
+      "exitCode": 255,
+      "cancelled": true,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "96",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "AV1 SVT 取消后恢复",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    },
+    {
+      "id": "97",
+      "elapsedMs": 20,
+      "liveReads": 1,
+      "liveUpdates": 0,
+      "progressUs": 0,
+      "busyRejected": false,
+      "media": null,
+      "probeError": "",
+      "error": "",
+      "label": "扩展编码后恢复及日志隔离",
+      "state": "passed",
+      "detail": "",
+      "logBytes": 2629,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logsTruncated": false
+    }
+  ],
+  "passed": 97,
+  "failed": 0,
+  "unsupported": 0,
+  "sanitizers": {
+    "address": true,
+    "undefinedBehavior": true,
+    "leakDetection": true,
+    "instrumented": [
+      "native/command.cpp",
+      "native/engine.cpp",
+      "video-matrix.cpp"
+    ],
+    "ffmpegAndExternalLibrariesInstrumented": false
+  }
+}

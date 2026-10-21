@@ -1,0 +1,206 @@
+{
+  "ogg": {
+    "ffmpegFlags": [],
+    "requiredComponents": []
+  },
+  "dav1d": {
+    "ffmpegFlags": [
+      "--enable-libdav1d"
+    ],
+    "requiredComponents": [
+      "LIBDAV1D_DECODER"
+    ]
+  },
+  "aom": {
+    "ffmpegFlags": [
+      "--enable-libaom"
+    ],
+    "requiredComponents": [
+      "LIBAOM_AV1_ENCODER",
+      "LIBAOM_AV1_DECODER"
+    ]
+  },
+  "svtav1": {
+    "ffmpegFlags": [
+      "--enable-libsvtav1"
+    ],
+    "requiredComponents": [
+      "LIBSVTAV1_ENCODER"
+    ]
+  },
+  "openh264": {
+    "ffmpegFlags": [
+      "--enable-libopenh264"
+    ],
+    "requiredComponents": [
+      "LIBOPENH264_ENCODER",
+      "LIBOPENH264_DECODER"
+    ]
+  },
+  "kvazaar": {
+    "ffmpegFlags": [
+      "--enable-libkvazaar"
+    ],
+    "requiredComponents": [
+      "LIBKVAZAAR_ENCODER"
+    ]
+  },
+  "openjpeg": {
+    "ffmpegFlags": [
+      "--enable-libopenjpeg"
+    ],
+    "requiredComponents": [
+      "LIBOPENJPEG_ENCODER"
+    ]
+  },
+  "vorbis": {
+    "ffmpegFlags": [
+      "--enable-libvorbis"
+    ],
+    "requiredComponents": [
+      "LIBVORBIS_ENCODER",
+      "LIBVORBIS_DECODER"
+    ]
+  },
+  "speex": {
+    "ffmpegFlags": [
+      "--enable-libspeex"
+    ],
+    "requiredComponents": [
+      "LIBSPEEX_ENCODER",
+      "LIBSPEEX_DECODER"
+    ]
+  },
+  "theora": {
+    "ffmpegFlags": [
+      "--enable-libtheora"
+    ],
+    "requiredComponents": [
+      "LIBTHEORA_ENCODER"
+    ]
+  },
+  "twolame": {
+    "ffmpegFlags": [
+      "--enable-libtwolame"
+    ],
+    "requiredComponents": [
+      "LIBTWOLAME_ENCODER"
+    ]
+  },
+  "shine": {
+    "ffmpegFlags": [
+      "--enable-libshine"
+    ],
+    "requiredComponents": [
+      "LIBSHINE_ENCODER"
+    ]
+  },
+  "gsm": {
+    "ffmpegFlags": [
+      "--enable-libgsm"
+    ],
+    "requiredComponents": [
+      "LIBGSM_ENCODER",
+      "LIBGSM_DECODER",
+      "LIBGSM_MS_ENCODER",
+      "LIBGSM_MS_DECODER"
+    ]
+  },
+  "ilbc": {
+    "ffmpegFlags": [
+      "--enable-libilbc"
+    ],
+    "requiredComponents": [
+      "LIBILBC_ENCODER",
+      "LIBILBC_DECODER"
+    ]
+  },
+  "lc3": {
+    "ffmpegFlags": [
+      "--enable-liblc3"
+    ],
+    "requiredComponents": [
+      "LIBLC3_ENCODER",
+      "LIBLC3_DECODER"
+    ]
+  },
+  "opencore-amr": {
+    "ffmpegFlags": [
+      "--enable-libopencore-amrnb",
+      "--enable-libopencore-amrwb"
+    ],
+    "requiredComponents": [
+      "LIBOPENCORE_AMRNB_ENCODER",
+      "LIBOPENCORE_AMRNB_DECODER",
+      "LIBOPENCORE_AMRWB_DECODER"
+    ]
+  },
+  "vo-amrwbenc": {
+    "ffmpegFlags": [
+      "--enable-libvo-amrwbenc"
+    ],
+    "requiredComponents": [
+      "LIBVO_AMRWBENC_ENCODER"
+    ]
+  },
+  "vvenc": {
+    "ffmpegFlags": [
+      "--enable-libvvenc"
+    ],
+    "requiredComponents": [
+      "LIBVVENC_ENCODER"
+    ]
+  },
+  "xeve": {
+    "ffmpegFlags": [
+      "--enable-libxeve"
+    ],
+    "requiredComponents": [
+      "LIBXEVE_ENCODER"
+    ]
+  },
+  "xevd": {
+    "ffmpegFlags": [
+      "--enable-libxevd"
+    ],
+    "requiredComponents": [
+      "LIBXEVD_DECODER"
+    ]
+  },
+  "codec2": {
+    "ffmpegFlags": [
+      "--enable-libcodec2"
+    ],
+    "requiredComponents": [
+      "LIBCODEC2_ENCODER",
+      "LIBCODEC2_DECODER"
+    ]
+  },
+  "oapv": {
+    "ffmpegFlags": [
+      "--enable-liboapv"
+    ],
+    "requiredComponents": [
+      "LIBOAPV_ENCODER"
+    ]
+  },
+  "uavs3d": {
+    "ffmpegFlags": [
+      "--enable-libuavs3d"
+    ],
+    "requiredComponents": [
+      "LIBUAVS3D_DECODER"
+    ]
+  },
+  "jxl": {
+    "ffmpegFlags": [
+      "--enable-libjxl"
+    ],
+    "requiredComponents": [
+      "LIBJXL_ENCODER",
+      "LIBJXL_DECODER",
+      "LIBJXL_ANIM_ENCODER",
+      "LIBJXL_ANIM_DECODER"
+    ]
+  }
+}

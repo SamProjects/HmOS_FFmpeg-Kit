@@ -11,17 +11,26 @@ cases=m.cases()
 def resolve(value):
  return value.replace('{ORIGINAL}',str(a.original.resolve())).replace('{VIDEO}',str(a.compatible.resolve())).replace('{DIR}',str(a.output.resolve()))
 lines=[]
+decode_count=0
 for c in cases:
  args=[resolve(x) for x in c['args']]
- lines.append(f"{c['id']} {c['timeout']} {c['cancelMs']} {int(c['repeatCancel'])} {int(c['concurrent'])} {len(args)} "+' '.join(json.dumps(x,ensure_ascii=False) for x in args))
+ lines.append(f"{c['id']} {c['timeout']} {c['cancelMs']} {int(c['repeatCancel'])} {int(c['concurrent'])} {len(args)} "+' '.join(json.dumps(x,ensure_ascii=False) for x in args)+' '+json.dumps(resolve(c['output']) if c['output'] else '',ensure_ascii=False))
+ if c['verifyDecode']:
+  verify=['-v','error','-xerror','-i',resolve(c['output']),'-f','null',resolve('{DIR}/verify.null')]
+  lines.append(f"{c['id']}v 45 -1 0 0 {len(verify)} "+' '.join(json.dumps(x,ensure_ascii=False) for x in verify)+' ""')
+  decode_count+=1
 process=subprocess.run([str(a.executable.resolve())],input='\n'.join(lines)+'\n',capture_output=True,text=True,timeout=240)
+(a.output/'driver-stdout.log').write_text(process.stdout)
+(a.output/'driver-stderr.log').write_text(process.stderr)
 if 'runtime error:' in process.stderr or 'ERROR: AddressSanitizer' in process.stderr or 'ERROR: LeakSanitizer' in process.stderr:
  raise RuntimeError(process.stderr[-6000:])
 if process.returncode: raise RuntimeError(f'Adapter exited {process.returncode}: {process.stderr[-3000:]}')
-records=[json.loads(line) for line in process.stdout.splitlines()]
-assert len(records)==len(cases),(len(records),len(cases))
+records=[json.loads(line.removeprefix('HMOS_RESULT ')) for line in process.stdout.splitlines() if line.startswith('HMOS_RESULT ')]
+assert len(records)==len(cases)+decode_count,(len(records),len(cases)+decode_count)
+by_id={r['id']:r for r in records}
 report=[]
-for c,r in zip(cases,records):
+for c in cases:
+ r=by_id[c['id']]
  state='passed';error='';v=r['result']
  try:
   assert c['id']==r['id']
@@ -44,26 +53,30 @@ for c,r in zip(cases,records):
    else:
     assert v['exitCode']==0 and not v['cancelled'] and not v['timedOut'],v['logs'][-1500:]
     if c['args']==['-version']: assert '9.0.2' in v['logs']
+    if c['args']==['-L']: assert 'Lesser General Public License' in v['logs'] and 'version 3' in v['logs']
     if c['requireLive']: assert r['liveReads']>1 and r['liveUpdates']>1 and 'frame=' in v['logs']
     if c['requireProgress']: assert r['progressUs']>0
     if c['requireTruncated']: assert v['logsTruncated'] and len(v['logs'])>100000
     if c['concurrent']: assert r['busyRejected']
     if c['output']:
      output=Path(resolve(c['output']));assert output.stat().st_size>0
-     info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(output)]))
+     assert not r['probeError'],r['probeError']
+     info=r['media']; assert info is not None
      for kind in ['video','audio']:
       expected=c[kind+'Codec']
       if not expected:continue
-      stream=next(s for s in info['streams'] if s['codec_type']==kind)
-      assert stream['codec_name']==expected,stream
+      stream=next(s for s in info['streams'] if s['type']==kind)
+      assert stream['codec']==expected,stream
       if kind=='video' and c['width']:assert stream['width']==c['width'] and stream['height']==c['height'],stream
-      if kind=='audio' and c['sampleRate']:assert int(stream['sample_rate'])==c['sampleRate']
+      if kind=='audio' and c['sampleRate']:assert stream['sampleRate']==c['sampleRate']
       if kind=='audio' and c['channels']:assert stream['channels']==c['channels']
-     duration=float(info['format'].get('duration',0))
+     duration=info['durationUs']/1000000
      if c['minDuration']:assert duration>=c['minDuration'],duration
      if c['maxDuration']:assert duration<=c['maxDuration'],duration
-     if c['label']=='视频去音轨':assert not any(s['codec_type']=='audio' for s in info['streams'])
-     if c['verifyDecode']:subprocess.run(['ffmpeg','-v','error','-xerror','-i',str(output),'-f','null','-'],check=True,capture_output=True,timeout=30)
+     if c['label']=='视频去音轨':assert not any(s['type']=='audio' for s in info['streams'])
+     if c['verifyDecode']:
+      decoded=by_id[c['id']+'v']
+      assert not decoded['error'] and decoded['result']['exitCode']==0,decoded['error'] or decoded['result']['logs'][-2000:]
  except Exception as e:state='failed';error=str(e)
  entry={k:v for k,v in r.items() if k not in ['result']}
  entry.update(label=c['label'],state=state,detail=error,logBytes=len(v['logs'].encode()) if v else 0)
@@ -71,7 +84,7 @@ for c,r in zip(cases,records):
  report.append(entry)
  print(c['id'],state,c['label'],error[:300],flush=True)
 summary={'scope':'Linux in-process FFmpeg 9.0.2 adapter; selected codecs match test cases; not HarmonyOS device execution',
- 'harmonyDeviceTested':False,'cases':report,'passed':sum(x['state']=='passed' for x in report),'failed':sum(x['state']=='failed' for x in report),'unsupported':sum(x['state']=='unsupported' for x in report)}
+ 'harmonyDeviceTested':False,'commandCalls':len(records),'outputDecodeCalls':decode_count,'outputMetadataMethod':'same native engine.probe with pinned FFmpeg 9.0.2','cases':report,'passed':sum(x['state']=='passed' for x in report),'failed':sum(x['state']=='failed' for x in report),'unsupported':sum(x['state']=='unsupported' for x in report)}
 (a.output/'report.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
 print(json.dumps({k:v for k,v in summary.items() if k!='cases'},ensure_ascii=False))
 raise SystemExit(bool(summary['failed']))

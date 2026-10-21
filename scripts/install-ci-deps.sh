@@ -10,7 +10,7 @@ options=(-o Dir::Etc::sourcelist=/etc/apt/sources.list.d/ubuntu.sources
 packages=(build-essential gnupg nasm)
 case "${1:?Use media or build}" in
   media) packages+=(ffmpeg) ;;
-  build) packages+=(cmake ninja-build pkg-config libgl1 unzip openjdk-17-jre-headless) ;;
+  build) packages+=(cmake ninja-build meson pkg-config libgl1 unzip openjdk-17-jre-headless) ;;
   *) exit 2 ;;
 esac
 sudo apt-get "${options[@]}" update

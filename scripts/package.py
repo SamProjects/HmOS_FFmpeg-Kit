@@ -56,7 +56,7 @@ for name, source in SOURCES.items():
     directory = licenses / name
     directory.mkdir()
     for p in (WORK / 'src' / name).rglob('*'):
-        if p.is_file() and (p.name.startswith(('COPYING','LICENSE','NOTICE')) or p.name in {'PATENTS','AUTHORS'}):
+        if p.is_file() and (p.name.upper().startswith(('COPYING','LICENSE','NOTICE','COPYRIGHT','PATENTS','AUTHORS'))):
             dest = directory / p.relative_to(WORK / 'src' / name)
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(p, dest)

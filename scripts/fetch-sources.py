@@ -18,7 +18,7 @@ for name, lock in SOURCES.items():
             write_json(WORK / 'integrity' / (name + '-diff.json'), changed)
             raise SystemExit('Upstream source changed: ' + name + ': ' + ', '.join(changed[:20]))
         continue
-    archive = download(lock['url'], WORK / 'downloads' / lock['url'].split('/')[-1], lock['sha256'])
+    archive = download(lock['url'], WORK / 'downloads' / lock.get('archive', lock['url'].split('/')[-1]), lock['sha256'])
     if name == 'ffmpeg':
         sig = download(lock['url'] + '.asc', str(archive) + '.asc')
         home = WORK / 'gnupg'

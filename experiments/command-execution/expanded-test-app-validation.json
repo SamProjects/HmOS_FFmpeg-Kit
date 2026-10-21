@@ -1,0 +1,33 @@
+{
+  "hap": "ffmpeg-command-test-emulator-unsigned.hap",
+  "sha256": "f75b81c414c57fde1e2026a411ad678665bd0f6d7d3922996878ba8e063c70c0",
+  "harSha256": "46edcd0d80a80679ba6f98c55a398b89ac70cd1e29594b7424a2e878475c6a27",
+  "bundleName": "com.samprojects.ffmpegsmoke",
+  "signed": false,
+  "target": "DevEco local emulator permitting unsigned development HAPs",
+  "installedOrExecuted": false,
+  "nativeLibrariesMatchHar": true,
+  "validation": {
+    "selectedAbis": [
+      "x86_64"
+    ],
+    "packagedAbis": [
+      "x86_64"
+    ],
+    "hapBytes": 86708604,
+    "nativeBytes": {
+      "x86_64": 73022744
+    },
+    "libraryCount": 10
+  },
+  "videoFixtures": {
+    "user-video.mp4": "d20428d3bb06ee05fde95fb86732e5d43bfb24de3107da3363cdc553d29bae80",
+    "compatible-video.mp4": "b0909203a129d97a69f5deb2aa47142bf794fec63e0e3a264a3c7faaa3afecc4"
+  },
+  "selectedAbis": [
+    "x86_64"
+  ],
+  "testCaseCount": 97,
+  "downloadFilename": "1.hap",
+  "bytes": 86708604
+}

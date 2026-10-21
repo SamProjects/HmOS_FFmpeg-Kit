@@ -15,6 +15,7 @@ int main() {
         hmosffmpeg::Task task; task.timeoutSeconds=timeout;
         for (int i=0;i<count;i++) { std::string arg; in >> std::quoted(arg); task.commandArguments.push_back(arg); }
         if (!in) return 2;
+        std::string probePath; in >> std::quoted(probePath);
         std::atomic<bool> done{false}; std::string result, error;
         auto start=steady_clock::now();
         std::thread worker([&] {
@@ -38,10 +39,16 @@ int main() {
             std::this_thread::sleep_for(milliseconds(20));
         }
         worker.join();
+        std::string media="null", probeError;
+        if(!probePath.empty()) {
+            hmosffmpeg::Task probeTask;probeTask.input=probePath;
+            try {media=hmosffmpeg::probe(probeTask);}
+            catch(const std::exception& e) {probeError=e.what();}
+        }
         auto ms=duration_cast<milliseconds>(steady_clock::now()-start).count();
         // Errors from the command adapter are ASCII option validation diagnostics.
-        std::cout << "{\"id\":\"" << id << "\",\"elapsedMs\":" << ms << ",\"liveReads\":" << reads
+        std::cout << "\nHMOS_RESULT {\"id\":\"" << id << "\",\"elapsedMs\":" << ms << ",\"liveReads\":" << reads
                   << ",\"liveUpdates\":" << updates << ",\"progressUs\":" << progress << ",\"busyRejected\":" << (busy?"true":"false")
-                  << ",\"error\":" << std::quoted(error) << ",\"result\":" << (result.empty()?"null":result) << "}\n" << std::flush;
+                  << ",\"media\":" << media << ",\"probeError\":" << std::quoted(probeError) << ",\"error\":" << std::quoted(error) << ",\"result\":" << (result.empty()?"null":result) << "}\n" << std::flush;
     }
 }

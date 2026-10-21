@@ -25,7 +25,7 @@ console.info(result.logs);
 
 ## 手机测试工程
 
-`examples/consumer` 当前提供视频测试 v2，使用用户提供的原片及由其生成的兼容片段，覆盖 60 项转码、日志、取消、超时和恢复测试。通过 `scripts/build-command-test-app.py --video /path/input.mp4` 生成包含素材的 App；素材不写入 Git。安装和操作见 [测试 App 说明](TEST-APP.zh-CN.md)。旧版 9 项音频自检已由用户确认在 DevEco 本地模拟器通过，v2 仍需安装运行确认。
+`examples/consumer` 当前提供扩展编解码测试 v3，使用用户提供的原片及由其生成的兼容片段，覆盖 97 项转码、日志、取消、超时和恢复测试。通过 `scripts/build-command-test-app.py --video /path/input.mp4` 生成包含素材的 App；素材不写入 Git。安装和操作见 [测试 App 说明](TEST-APP.zh-CN.md)。旧版 9 项音频自检已由用户确认在 DevEco 本地模拟器通过，v3 仍需安装运行确认。
 
 本地构建生成的三个消费 HAP 是未签名的编译验证产物，不能当作已经安装运行的证据。签名、安装和手机权限按自己的应用配置处理。不要替换签名或将 hdc shell 运行成功视为 App 沙箱验证成功。
 
@@ -74,3 +74,5 @@ python3 scripts/check-release.py dist/assets
 默认禁用终端统计回显，可在命令参数加入 `-stats -stats_period 0.2`，实时捕获 `frame= / time= / speed=` 等统计信息。普通 FFmpeg 日志无需开启 `-stats`。日志达到上限时停止追加并设置 `logsTruncated`，应用应按需要保存每项最终日志。不能通过此接口使用 shell、标准输入或 `-progress pipe:1`。
 
 扩展视频测试说明见 [TEST-APP.zh-CN.md](TEST-APP.zh-CN.md)。
+
+第三方库自行写入进程 stdout/stderr 的内容不保证被捕获；本接口捕获 FFmpeg 的 av_log 和 FFTools 输出，不重定向整个 App 的标准 IO。

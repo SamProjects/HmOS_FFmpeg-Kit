@@ -61,3 +61,6 @@ Version: 3.100
 Libs: -L\${libdir} -lmp3lame -lm
 Cflags: -I\${includedir}
 PC
+
+# Additional permissively licensed / LGPL codec implementations. Fail closed if any fails.
+python3 scripts/build-codec-deps.py "$BUILD/codecs" "$PREFIX"

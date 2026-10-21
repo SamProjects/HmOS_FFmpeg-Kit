@@ -49,6 +49,8 @@ if [[ "$PROFILE" == extended ]]; then
   fi
   echo "第三方依赖编译完成：$PROFILE $ABI（失败时输出日志摘要）"
   extra+=(--enable-libopus --enable-libvpx --enable-libmp3lame --enable-zlib --enable-mbedtls)
+  mapfile -t codec_flags < <(python3 -c 'import json; print("\n".join(flag for dep in json.load(open("config/codec-dependencies.json")).values() for flag in dep["ffmpegFlags"]))')
+  extra+=("${codec_flags[@]}")
 fi
 SOURCE="$ROOT/work/src/ffmpeg"
 if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then
@@ -63,13 +65,13 @@ args=("--prefix=$PREFIX" --target-os=linux "--arch=$ARCH" "--cpu=$CPU"
   "--host-cc=$(command -v cc)" "--ar=$AR" "--ranlib=$RANLIB"
   "--nm=$SDK/llvm/bin/llvm-nm" "--strip=$SDK/llvm/bin/llvm-strip"
   --enable-shared --disable-static --enable-pic --disable-stripping
-  --enable-version3 --disable-gpl --disable-nonfree --disable-autodetect
+  --enable-version3 --disable-gpl --disable-nonfree --disable-autodetect --pkg-config-flags=--static
   --disable-ffplay --disable-doc
   --enable-network --enable-pthreads --disable-linux-perf
   --disable-indevs --disable-outdevs
   "--extra-cflags=-O2 -g -fPIC -march=$MARCH -I$PREFIX/include"
   "--extra-ldflags=-fuse-ld=lld -L$PREFIX/lib -Wl,-z,relro,-z,now,--build-id=sha1"
-  --extra-ldexeflags=-pie "${extra[@]}")
+  --extra-ldexeflags=-pie --extra-libs="-lc++ -lm -pthread" "${extra[@]}")
 if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then
   args+=(--enable-ffmpeg --disable-ffprobe)
 elif [[ "${HMOS_HAR_ONLY:-0}" == 1 ]]; then

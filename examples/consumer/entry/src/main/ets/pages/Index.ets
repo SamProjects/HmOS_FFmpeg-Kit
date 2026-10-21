@@ -22,12 +22,13 @@ struct Index {
   @State message: string = '正在加载 HAR…';
   @State logs: string = '';
   @State version: string = '';
+  @State catalog: string = '';
   @State status: string = '准备中';
   @State current: string = '';
   @State available: boolean = false;
   @State running: boolean = false;
   @State completed: number = 0;
-  @State total: number = 60;
+  @State total: number = 97;
   @State passed: number = 0;
   @State failed: number = 0;
   @State unsupported: number = 0;
@@ -41,11 +42,13 @@ struct Index {
   aboutToAppear(): void {
     try {
       const info = FFmpeg.getBuildInfo();
-      this.version = 'FFmpeg ' + info.version + ' · 视频测试 v2';
+      this.version = 'FFmpeg ' + info.version + ' · 扩展编解码测试 v3';
+      const caps = FFmpeg.getCapabilities();
+      this.catalog = info.license + ' · 编码器 ' + caps.encoders.length + ' · 解码器 ' + caps.decoders.length;
       this.available = info.commandExecution === 'experimental-serial';
       this.status = this.available ? '准备就绪' : '命令引擎未启用';
       this.message = '内置原始 AV1 视频和由它生成的 8 秒 MPEG4 测试片段。\n' +
-        '完整测试约需 1～3 分钟；AV1 解码不支持会单独列出。\n' +
+        '已加入 AV1 软件解码及更多视频、音频编码器，完整测试需数分钟。\n' +
         '预期错误、取消及超时也属于测试，不代表 App 故障。';
     } catch (e) { this.status = '加载失败'; this.message = String(e); }
   }
@@ -59,10 +62,12 @@ struct Index {
   private write(path: string, data: ArrayBuffer): void {
     const file = fs.openSync(path, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE | fs.OpenMode.TRUNC);
     try {
-      if (fs.writeSync(file.fd, data) !== data.byteLength) throw new Error('文件写入不完整：' + path);
+      if (data.byteLength > 0 && fs.writeSync(file.fd, data) !== data.byteLength) throw new Error('文件写入不完整：' + path);
     } finally { fs.closeSync(file); }
   }
   private writeText(path: string, text: string): void {
+    // HarmonyOS TextEncoder.encodeInto('') may return undefined. Create a real empty file.
+    if (text.length === 0) { this.write(path, new ArrayBuffer(0)); return; }
     const bytes = new util.TextEncoder().encodeInto(text);
     this.write(path, bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
   }
@@ -170,7 +175,11 @@ struct Index {
         record.exitCode = result.exitCode; record.cancelled = result.cancelled;
         record.timedOut = result.timedOut; record.logsTruncated = result.logsTruncated;
         this.displayLogs('$ ffmpeg ' + args.join(' ') + '\n' + result.logs);
-        this.writeText(this.context().filesDir + '/test-' + c.id + '.log', result.logs);
+        const logPath = this.context().filesDir + '/test-' + c.id + '.log';
+        this.writeText(logPath, result.logs);
+        if (c.label === '静默日志级别') {
+          this.check(result.logs.length === 0 && fs.statSync(logPath).size === 0, '静默命令未正确保存空日志');
+        }
         if (c.expected === 'cancel') {
           this.check(result.cancelled && result.exitCode !== 0 && !result.timedOut, '未正确取消');
           this.check(Date.now() - start - c.cancelMs < 5000, '取消响应超过 5 秒');
@@ -187,6 +196,7 @@ struct Index {
         } else {
           this.check(result.exitCode === 0 && !result.cancelled && !result.timedOut, '命令失败，exitCode=' + result.exitCode);
           if (c.label.includes('版本') || c.args[0] === '-version') this.check(result.logs.includes('9.0.2'), '版本日志缺失');
+          if (c.args[0] === '-L') this.check(result.logs.includes('Lesser General Public License') && result.logs.includes('version 3'), '运行时许可不是 LGPLv3');
           if (c.requireLive) this.check(record.liveReads > 1 && record.liveUpdates > 1 && result.logs.includes('frame='), '执行期间未读到实时日志');
           if (c.requireProgress) this.check(record.progressUs > 0, '执行期间未读到进度');
           if (c.requireTruncated) this.check(result.logsTruncated && result.logs.length > 100000, '日志截断上限未生效');
@@ -254,6 +264,7 @@ struct Index {
     Column({ space: 8 }) {
       Text('FFmpeg 视频与中断测试').fontSize(22).fontWeight(FontWeight.Bold)
       Text(this.version).fontSize(12).fontColor('#52606D')
+      Text(this.catalog).fontSize(10).fontColor('#52606D')
       Text(this.status).fontSize(14).fontColor(this.failed > 0 ? '#B42318' : '#087F5B')
       Progress({ value: this.completed, total: this.total, type: ProgressType.Linear }).width('100%')
       Button(this.running ? '测试中…' : '运行全部 ' + this.total + ' 项测试').width('100%')
@@ -282,7 +293,7 @@ struct Index {
           Text(this.message).width('100%').fontSize(13).copyOption(CopyOptions.LocalDevice).padding(10)
         }.layoutWeight(1).width('100%').backgroundColor('#F2F5F7').borderRadius(10)
       }
-      Text('原片 AV1 能力单列 · 兼容片段用于滤镜转码 · 全程离线').fontSize(10).fontColor('#667788')
+      Text('AV1 软件解码 · 多视频/音频编码器 · 全程离线').fontSize(10).fontColor('#667788')
     }.padding({ top: 20, bottom: 16, left: 16, right: 16 }).width('100%').height('100%')
   }
 }

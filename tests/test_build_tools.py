@@ -66,6 +66,27 @@ class BuildToolsTests(unittest.TestCase):
             (f / 'config.h').write_text(conf.replace('CONFIG_NONFREE 0', 'CONFIG_NONFREE 1'))
             with self.assertRaises(ValueError): gate.license_gate()
 
+    def test_codec_gate_requires_real_decoder_and_encoder_components(self):
+        old_argv = sys.argv[:]
+        sys.argv = ['test', 'extended']
+        try:
+            spec = importlib.util.spec_from_file_location('codec_gate', ROOT / 'scripts/verify-build.py')
+            gate = importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)
+        finally: sys.argv = old_argv
+        with tempfile.TemporaryDirectory() as directory:
+            gate.BUILD = Path(directory)
+            (gate.BUILD / 'ffmpeg').mkdir()
+            dependencies = json.loads((ROOT / 'config/codec-dependencies.json').read_text())
+            names = [name for dep in dependencies.values() for name in dep['requiredComponents']]
+            config = ''.join('#define CONFIG_' + name + ' 1\n' for name in names)
+            path = gate.BUILD / 'ffmpeg/config_components.h'
+            path.write_text(config)
+            gate.codec_gate()
+            path.write_text(config.replace('#define CONFIG_LIBDAV1D_DECODER 1', '#define CONFIG_LIBDAV1D_DECODER 0'))
+            with self.assertRaisesRegex(ValueError, 'LIBDAV1D_DECODER'): gate.codec_gate()
+            path.write_text(config.replace('#define CONFIG_LIBOPENH264_ENCODER 1', '#define CONFIG_LIBOPENH264_ENCODER 0'))
+            with self.assertRaisesRegex(ValueError, 'LIBOPENH264_ENCODER'): gate.codec_gate()
+
     def test_release_rejects_asset_tampering(self):
         spec = importlib.util.spec_from_file_location('release_gate', ROOT / 'scripts/check-release.py')
         gate = importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)

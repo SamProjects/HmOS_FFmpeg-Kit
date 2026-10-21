@@ -33,7 +33,7 @@ def cases():
     media('原片音频无损提取', ['-vn','-c:a','copy'], 'original-audio.m4a',source='{ORIGINAL}',audioCodec='aac',minDuration=2,maxDuration=4)
     media('原片音频转 PCM 16k 单声道', ['-vn','-c:a','pcm_s16le','-ar','16000','-ac','1'], 'original-audio.wav',source='{ORIGINAL}',audioCodec='pcm_s16le',sampleRate=16000,channels=1,minDuration=2,maxDuration=4)
     media('原片音频重新编码 AAC', ['-vn','-c:a','aac','-b:a','64k'], 'original-aac.m4a',source='{ORIGINAL}',audioCodec='aac')
-    add('原片 AV1 实际解码能力', ['-i','{ORIGINAL}','-t','1','-an','-f','null','{DIR}/av1.null'], expected='capability')
+    add('原片 AV1 实际解码能力', ['-c:v','libdav1d','-i','{ORIGINAL}','-t','1','-an','-f','null','{DIR}/av1.null'], expected='success')
     media('兼容素材重封装 MKV', ['-c','copy'], 'copy.mkv',videoCodec='mpeg4',audioCodec='aac',minDuration=2,maxDuration=4)
     media('MPEG4 视频和 AAC 音频转码', ['-c:v','mpeg4','-q:v','6','-c:a','aac'], 'transcode.mp4',videoCodec='mpeg4',audioCodec='aac',verifyDecode=True,minDuration=2,maxDuration=4)
     media('缩放 160x90', ['-vf','scale=160:90','-c:v','mpeg4','-an'], 'scale.mp4',videoCodec='mpeg4',width=160,height=90,verifyDecode=True)
@@ -70,6 +70,44 @@ def cases():
     add('静默日志级别', ['-v','quiet','-i','{VIDEO}','-t','1','-f','null','{DIR}/quiet.null'])
     add('日志上限及截断标记', ['-loglevel','verbose','-debug_ts','-stream_loop','2','-i','{VIDEO}','-t','15','-f','null','{DIR}/bounded.null'],requireTruncated=True)
     add('长日志后恢复及日志隔离', ['-version'])
+    add('运行时 LGPLv3 许可文本', ['-L'])
+    media('原片 AV1 软件解码并转 H264', ['-vf','scale=160:90','-c:v','libopenh264','-b:v','180k','-threads','1','-c:a','aac'], 'av1-h264.mp4',source='{ORIGINAL}',videoCodec='h264',audioCodec='aac',width=160,height=90,verifyDecode=True)
+    media('原片 AV1 软件解码并转 HEVC', ['-vf','scale=128:128','-c:v','libkvazaar','-kvazaar-params','preset=ultrafast,threads=1','-an'], 'av1-hevc.mkv',source='{ORIGINAL}',videoCodec='hevc',width=128,height=128,verifyDecode=True)
+    media('AV1 编码 libaom', ['-vf','scale=128:128','-frames:v','3','-c:v','libaom-av1','-cpu-used','8','-threads','1','-an'], 'aom.mkv',videoCodec='av1',width=128,height=128,verifyDecode=True)
+    media('AV1 编码 SVT-AV1', ['-vf','scale=128:128','-frames:v','3','-c:v','libsvtav1','-preset','12','-svtav1-params','lp=1','-an'], 'svt.mkv',videoCodec='av1',width=128,height=128,verifyDecode=True)
+    media('H264 编码 OpenH264', ['-c:v','libopenh264','-b:v','200k','-threads','1','-c:a','aac'], 'h264.mp4',videoCodec='h264',audioCodec='aac',verifyDecode=True)
+    media('HEVC 编码 Kvazaar', ['-vf','scale=128:128','-frames:v','3','-c:v','libkvazaar','-kvazaar-params','preset=ultrafast,threads=1','-an'], 'hevc.mkv',videoCodec='hevc',width=128,height=128,verifyDecode=True)
+    media('VP8 编码 libvpx', ['-vf','scale=160:90','-frames:v','3','-c:v','libvpx','-deadline','realtime','-cpu-used','8','-threads','1','-an'], 'vp8.webm',videoCodec='vp8',width=160,height=90,verifyDecode=True)
+    media('VP9 编码 libvpx', ['-vf','scale=160:90','-frames:v','3','-c:v','libvpx-vp9','-deadline','realtime','-cpu-used','8','-threads','1','-an'], 'vp9.webm',videoCodec='vp9',width=160,height=90,verifyDecode=True)
+    media('VVC 编码 VVenC', ['-vf','scale=128:128','-frames:v','3','-c:v','libvvenc','-preset','faster','-threads','1','-an'], 'vvc.266',videoCodec='vvc',width=128,height=128,verifyDecode=True)
+    media('EVC 编码 XEVE 和解码 XEVD', ['-vf','scale=128:128','-frames:v','3','-c:v','libxeve','-bf','0','-preset','fast','-threads','1','-an','-f','evc'], 'evc.evc',videoCodec='evc',width=128,height=128,verifyDecode=True)
+    media('APV 专业视频编码', ['-vf','scale=128:128,format=yuv422p10le','-frames:v','3','-c:v','liboapv','-threads','1','-an','-f','mov'], 'apv.mov',videoCodec='apv',width=128,height=128,verifyDecode=True)
+    media('Theora 编码', ['-vf','scale=160:96','-frames:v','3','-c:v','libtheora','-q:v','4','-an'], 'theora.ogv',videoCodec='theora',width=160,height=96,verifyDecode=True)
+    media('JPEG2000 编码 OpenJPEG', ['-frames:v','1','-an','-c:v','libopenjpeg','-update','1'], 'frame.j2k',videoCodec='jpeg2000',width=320,height=180,verifyDecode=True)
+    media('JPEG XL 编码与解码', ['-frames:v','1','-an','-c:v','libjxl','-effort','1','-update','1'], 'frame.jxl',videoCodec='jpegxl',width=320,height=180,verifyDecode=True)
+    for label,encoder,filename,codec,ar,ac,bitrate in [
+      ('MP3 LAME','libmp3lame','lame.mp3','mp3',44100,2,'128k'),
+      ('MP3 Shine','libshine','shine.mp3','mp3',44100,2,'128k'),
+      ('MP2 TwoLAME','libtwolame','twolame.mp2','mp2',48000,2,'128k'),
+      ('Opus','libopus','opus.ogg','opus',48000,2,'64k'),
+      ('Vorbis','libvorbis','vorbis.ogg','vorbis',48000,2,'64k'),
+      ('Speex','libspeex','speex.ogg','speex',16000,1,'24k'),
+      ('GSM','libgsm','gsm.gsm','gsm',8000,1,'13k'),
+      ('GSM WAV49','libgsm_ms','gsm.wav','gsm_ms',8000,1,'13k'),
+      ('AMR-NB','libopencore_amrnb','amr.amr','amr_nb',8000,1,'12.2k'),
+      ('AMR-WB','libvo_amrwbenc','amr-wb.amr','amr_wb',16000,1,'12.65k'),
+      ('LC3','liblc3','lc3.lc3','lc3',48000,1,'96k'),
+      ('iLBC','libilbc','ilbc.lbc','ilbc',8000,1,'15.2k'),
+      ('Codec2','libcodec2','codec2.c2','codec2',8000,1,'3.2k')]:
+        media(label+' 编码和解码', ['-vn','-c:a',encoder,'-ar',str(ar),'-ac',str(ac),'-b:a',bitrate],filename,audioCodec=codec,sampleRate=ar,channels=ac,verifyDecode=True)
+    for label,codec,options in [
+      ('H264','libopenh264',['-b:v','180k']),
+      ('HEVC','libkvazaar',['-kvazaar-params','preset=ultrafast,threads=1']),
+      ('AV1 libaom','libaom-av1',['-cpu-used','8']),
+      ('AV1 SVT','libsvtav1',['-preset','12','-svtav1-params','lp=1'])]:
+        add(label+' 转码中取消', ['-y','-re','-stream_loop','-1','-i','{VIDEO}','-t','60','-vf','scale=128:128','-an','-c:v',codec,'-threads','1',*options,'{DIR}/cancel-codec.mkv'],expected='cancel',cancelMs=700)
+        add(label+' 取消后恢复', ['-version'])
+    add('扩展编码后恢复及日志隔离', ['-version'])
     return result
 
 if __name__ == '__main__':
