@@ -42,11 +42,14 @@ def main():
                         default=DIST / 'assets/hmos-ffmpeg-1.0.2-extended-all-command-test.har')
     parser.add_argument('--tools', type=Path, default=Path(os.environ.get(
         'HARMONY_TOOLS', str(WORK / 'sdk/command-line-tools'))))
+    parser.add_argument('--video', type=Path, required=True, help='Private local input video, embedded only in generated artifacts')
     parser.add_argument('--output', type=Path, default=DIST / 'test-app')
     args = parser.parse_args()
     har, tools, output = args.har.resolve(), args.tools.resolve(), args.output.resolve()
     if not har.is_file() or not (tools / 'sdk').is_dir():
         parser.error('Provide an existing command-test HAR and HarmonyOS Command Line Tools directory')
+    if not args.video.is_file():
+        parser.error('--video must point to an existing local media file')
     libraries = inspect_har(har)
     output.mkdir(parents=True, exist_ok=True)
     WORK.mkdir(exist_ok=True)
@@ -60,6 +63,15 @@ def main():
         shutil.copytree(ROOT / 'examples/consumer', project, ignore=shutil.ignore_patterns(
             'build', '.hvigor', 'oh_modules', 'node_modules', 'local.properties',
             'oh-package-lock.json5', '*.har'))
+        raw = project / 'entry/src/main/resources/rawfile'
+        fixture_manifest = None
+        if args.video:
+            original = args.video.resolve()
+            shutil.copy2(original, raw / 'user-video.mp4')
+            subprocess.run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', str(original),
+                            '-t', '8', '-vf', 'scale=320:180', '-c:v', 'mpeg4', '-q:v', '5',
+                            '-c:a', 'aac', '-ar', '48000', str(raw / 'compatible-video.mp4')], check=True)
+            fixture_manifest = {name:sha256(raw / name) for name in ['user-video.mp4','compatible-video.mp4']}
         (project / 'entry/libs').mkdir(exist_ok=True)
         shutil.copy2(har, project / 'entry/libs/hmos-ffmpeg.har')
         profile_path = project / 'entry/build-profile.json5'
@@ -85,6 +97,10 @@ def main():
         with zipfile.ZipFile(hap) as archive:
             if archive.testzip() is not None:
                 raise ValueError('Invalid HAP ZIP')
+            if fixture_manifest:
+                for name, expected in fixture_manifest.items():
+                    if hashlib.sha256(archive.read('resources/rawfile/' + name)).hexdigest() != expected:
+                        raise ValueError('Video fixture hash mismatch: ' + name)
             module = json.loads(archive.read('module.json'))
             if not any(name.endswith('modules.abc') for name in archive.namelist()):
                 raise ValueError('Missing compiled ArkTS code')
@@ -94,7 +110,7 @@ def main():
                   'bundleName':module['app']['bundleName'], 'signed':False,
                   'target':'DevEco local emulator permitting unsigned development HAPs',
                   'installedOrExecuted':False, 'nativeLibrariesMatchHar':True,
-                  'validation':validation}
+                  'validation':validation, 'videoFixtures':fixture_manifest}
         (output / 'validation.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n')
         shutil.copy2(ROOT / 'docs/TEST-APP.zh-CN.md', output / 'README.zh-CN.md')
         print(json.dumps(record, ensure_ascii=False, indent=2))

@@ -25,7 +25,7 @@ console.info(result.logs);
 
 ## 手机测试工程
 
-`examples/consumer` 内置一个自生成的 0.2 秒 PCM WAV。将实验 HAR 导入该工程、使用自己的签名配置在 DevEco 中安装到手机。页面上的“运行命令测试”会执行版本查询、非法参数、错误后重试、真实文件重封装、音量滤镜、取消及取消后重试。“取消当前任务”可用于手动测试取消路径。页面还会检查输出文件、编码格式与采样率，并测试超时退出和超时后重试，共 9 项。需要直接安装的本地模拟器 HAP 及安装方法见 [测试 App 说明](TEST-APP.zh-CN.md)。
+`examples/consumer` 当前提供视频测试 v2，使用用户提供的原片及由其生成的兼容片段，覆盖 60 项转码、日志、取消、超时和恢复测试。通过 `scripts/build-command-test-app.py --video /path/input.mp4` 生成包含素材的 App；素材不写入 Git。安装和操作见 [测试 App 说明](TEST-APP.zh-CN.md)。旧版 9 项音频自检已由用户确认在 DevEco 本地模拟器通过，v2 仍需安装运行确认。
 
 本地构建生成的三个消费 HAP 是未签名的编译验证产物，不能当作已经安装运行的证据。签名、安装和手机权限按自己的应用配置处理。不要替换签名或将 hdc shell 运行成功视为 App 沙箱验证成功。
 
@@ -66,3 +66,11 @@ python3 scripts/check-release.py dist/assets
 主机验证使用与 NAPI 相同的 `native/command.cpp`，在同一个进程里重复调用命令库，覆盖 20 次命令执行、WAV 产物内容、选项状态复位、错误重试、复杂滤镜、取消和超时重试、应用 SIGINT 处理器保留；另用 AddressSanitizer/UndefinedBehaviorSanitizer 检查 C++ 适配层及进程退出泄漏。底层 FFmpeg 动态库未做全量 sanitizer 插桩，这些结果不替代手机测试。可执行 `bash scripts/test-command-host.sh /path/to/ffmpeg-9.0.2` 复现；实验流水线在原媒体测试后执行该项，普通流水线跳过。
 
 本地实验 HAR 复用了已发布 `v1.0.2-ci.11` 中校验过的 extended 动态库，使用锁定 SDK 为 ARM64、x86_64 重新编译命令组件和 NAPI 桥接。临时 manifest 记录基线与适配哈希。标准实验构建脚本则从锁定源码完整重建，不依赖该复用流程。没有推送或触发远端构建。
+
+## 实时日志（实验版 v2）
+
+`FFmpeg.readCommandLogs(session.id)` 返回 `{ logs, logsTruncated }`，任务已结束/不存在时返回 null。推荐在 ArkTS 每 150 ms 读取一次，同时用 `FFmpeg.progressUs(id)` 读微秒进度；在 finally 中清除定时器。原生工作线程写入有锁、最多 256 KiB 的每任务缓存，不直接调用 ArkTS 回调。Promise 返回后使用 `result.logs` 读取最终日志；缓存不会保留在已完成任务表中。
+
+默认禁用终端统计回显，可在命令参数加入 `-stats -stats_period 0.2`，实时捕获 `frame= / time= / speed=` 等统计信息。普通 FFmpeg 日志无需开启 `-stats`。日志达到上限时停止追加并设置 `logsTruncated`，应用应按需要保存每项最终日志。不能通过此接口使用 shell、标准输入或 `-progress pipe:1`。
+
+扩展视频测试说明见 [TEST-APP.zh-CN.md](TEST-APP.zh-CN.md)。

@@ -17,6 +17,7 @@ export interface TranscodeOptions {
   caFile?: string;
 }
 export interface CommandResult { exitCode: number; cancelled: boolean; timedOut: boolean; logs: string; logsTruncated: boolean; }
+export interface CommandLogSnapshot { logs: string; logsTruncated: boolean; }
 export interface CommandSession { id: number; result: Promise<CommandResult>; }
 export interface Session { id: number; result: Promise<void>; }
 
@@ -47,6 +48,11 @@ export class FFmpeg {
       return JSON.parse(value) as CommandResult;
     });
     return { id, result };
+  }
+  // Poll while active (e.g. every 150 ms); use result.logs after completion.
+  // Null means this session has completed or does not exist. Buffer limit: 256 KiB.
+  static readCommandLogs(id: number): CommandLogSnapshot | null {
+    return JSON.parse(native.readCommandLogs(id)) as CommandLogSnapshot | null;
   }
   static cancel(id: number): void { native.control(id, true); }
   // Latest input packet timestamp in microseconds; -1 after the session ends.

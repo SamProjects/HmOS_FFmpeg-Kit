@@ -112,12 +112,26 @@ napi_value control(napi_env env, napi_callback_info info) {
         napi_value value; ok(napi_create_int64(env, progress, &value)); return value;
     } catch(const std::exception& e) { return fail(env, e.what()); }
 }
+// Synchronous snapshot; FFmpeg worker threads never call the ArkTS runtime.
+napi_value readCommandLogs(napi_env env, napi_callback_info info) {
+    try {
+        napi_value argv[1]; size_t argc = 1;
+        ok(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
+        if(argc != 1) throw std::runtime_error("Expected session id");
+        int32_t id; ok(napi_get_value_int32(env, argv[0], &id));
+        std::shared_ptr<Task> task;
+        { std::lock_guard<std::mutex> lock(guard); auto it = tasks.find({env,id});
+          if(it != tasks.end()) task = it->second; }
+        return text(env, task ? hmosffmpeg::commandLogSnapshot(*task) : "null");
+    } catch(const std::exception& e) { return fail(env, e.what()); }
+}
 napi_value init(napi_env env, napi_value exports) {
     napi_property_descriptor properties[] = {
         {"getBuildInfo", nullptr, buildInfo, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"getCapabilities", nullptr, capabilities, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"run", nullptr, start, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"execute", nullptr, start, nullptr, nullptr, nullptr, napi_default, reinterpret_cast<void*>(1)},
+        {"readCommandLogs", nullptr, readCommandLogs, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"control", nullptr, control, nullptr, nullptr, nullptr, napi_default, nullptr}
     };
     napi_define_properties(env, exports, sizeof(properties)/sizeof(properties[0]), properties);

@@ -5,3 +5,5 @@ export const run: (id: number, operation: string, input: string, output: string,
 export const control: (id: number, cancel: boolean) => number;
 
 export const execute: (id: number, args: string[], timeoutSeconds: number) => Promise<string>;
+
+export const readCommandLogs: (id: number) => string;
