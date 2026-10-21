@@ -4,8 +4,7 @@ set -euo pipefail
 notes=docs/RELEASE-NOTES.md
 label='预发布版'
 if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then
-  notes=docs/COMMAND-TEST.zh-CN.md
-  label='命令执行实验版'
+  label='命令执行与扩展编解码预发布版'
 fi
 # Verify the actual tag commit; target_commitish metadata is not authoritative
 # when the release was created for a tag that already existed.

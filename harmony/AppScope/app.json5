@@ -2,7 +2,7 @@
   "app": {
     "bundleName": "com.samprojects.hmosffmpeg",
     "vendor": "SamProjects",
-    "versionCode": 10000,
-    "versionName": "1.0.1"
+    "versionCode": 10003,
+    "versionName": "1.0.3"
   }
 }

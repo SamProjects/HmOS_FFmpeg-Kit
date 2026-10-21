@@ -1,9 +1,9 @@
 # 导入鸿蒙项目
 
-下载同一次 Release 的 `hmos-ffmpeg-1.0.1-extended-all.har`（含 arm64-v8a、x86_64），或选择 `-arm64-v8a.har` / `-x86_64.har` 单架构包，放入应用的 `entry/libs/`，在 **entry 模块** `oh-package.json5` 添加：
+下载同一次 Release 的 `hmos-ffmpeg-1.0.3-extended-all-command-test.har`（含 arm64-v8a、x86_64、扩展编解码和命令组件），放入应用的 `entry/libs/`，在 **entry 模块** `oh-package.json5` 添加：
 
 ```json
-{"dependencies":{"@samprojects/hmos-ffmpeg":"file:./libs/hmos-ffmpeg-1.0.1-extended-all.har"}}
+{"dependencies":{"@samprojects/hmos-ffmpeg":"file:./libs/hmos-ffmpeg-1.0.3-extended-all-command-test.har"}}
 ```
 
 安装依赖（ohpm install），目标 ABI 选择 arm64-v8a，兼容 API 12 及以上。HAR 包含桥接、FFmpeg so 和所需 C++ runtime，不要再同时引入另一套同名 FFmpeg so。消费项目需要 DevEco/Command Line Tools 中支持本包模型的 Hvigor；原生最低 API 和实际运行兼容性仍需在目标设备验证。
@@ -59,3 +59,7 @@ set_target_properties(your_native_target PROPERTIES SKIP_BUILD_RPATH TRUE)
 本仓库目前为私有仓库时，仓库 Release 链接对所有最终用户并不一定可访问；应用正式分发前应将对应源码和配方放到用户可访问的服务，不能只提供受限链接。
 
 必须评估并实际验证用户替换兼容 LGPL 库的方式；签名/安装受限时评估可行重链接路径，详见 replacement-and-relink.md。预发布包的构建通过不能代替设备运行和分发合规结论。
+
+## FFmpeg 命令参数
+
+本次 Release 包含 `FFmpeg.execute(args, timeoutSeconds)`、实时日志 `FFmpeg.readCommandLogs(id)`、进度与取消。参数数组不含开头的 ffmpeg；调用和限制见 [命令接口说明](COMMAND-TEST.zh-CN.md)。

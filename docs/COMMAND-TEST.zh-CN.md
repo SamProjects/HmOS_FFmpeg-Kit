@@ -25,7 +25,7 @@ console.info(result.logs);
 
 ## 手机测试工程
 
-`examples/consumer` 当前提供扩展编解码测试 v3，使用用户提供的原片及由其生成的兼容片段，覆盖 97 项转码、日志、取消、超时和恢复测试。通过 `scripts/build-command-test-app.py --video /path/input.mp4` 生成包含素材的 App；素材不写入 Git。安装和操作见 [测试 App 说明](TEST-APP.zh-CN.md)。旧版 9 项音频自检已由用户确认在 DevEco 本地模拟器通过，v3 仍需安装运行确认。
+`examples/consumer` 当前提供扩展编解码测试 v3，使用用户提供的原片及由其生成的兼容片段，覆盖 97 项转码、日志、取消、超时和恢复测试。通过 `scripts/build-command-test-app.py --video /path/input.mp4` 生成包含素材的 App；素材不写入 Git。安装和操作见 [测试 App 说明](TEST-APP.zh-CN.md)。旧版 9 项音频自检已由用户确认在 DevEco 本地模拟器通过，用户已反馈 v3 在 x86_64 DevEco 本地模拟器 97/97 项全部通过；ARM64 手机及最低系统版本仍待验证。
 
 本地构建生成的三个消费 HAP 是未签名的编译验证产物，不能当作已经安装运行的证据。签名、安装和手机权限按自己的应用配置处理。不要替换签名或将 hdc shell 运行成功视为 App 沙箱验证成功。
 
@@ -41,7 +41,7 @@ console.info(result.logs);
 
 ## 构建
 
-正常流水线仍默认生成普通 extended 全架构 HAR。手动运行 `build-release.yml` 时设置 `command_test=true` 可构建实验版；建议第一次将 `publish=false`，从日志检查构建结果。流水线仍不保存 Actions Artifacts；需要保留下载成品时，应显式选择发布预发布版。
+自 v1.0.3 起，正常流水线默认生成包含命令组件的 extended 全架构 HAR；手动运行 `build-release.yml` 时 `command_test` 默认开启，显式设为 false 才构建无命令组件的包。流水线仍不保存 Actions Artifacts；需要保留下载成品时，应显式选择发布预发布版。
 
 本地使用已安装且校验过的 HarmonyOS SDK：
 
@@ -61,9 +61,9 @@ python3 scripts/check-release.py dist/assets
 
 本次用户明确要求制作命令测试版，作为原 `DEVELOPMENT.zh-CN.md` 零补丁约束的实验例外。`prepare-command-source.py` 只处理锁定的 9.0.2，复制原始树后适配四个 fftools 文件，记录逐文件前后哈希及完整 diff。`work/src/ffmpeg` 的原始树仍执行原完整性检查，libav 源码不修改。不得将命令组件标为原版零补丁。
 
-适配包括：库入口、选项/计数/进度状态复位、禁用应用进程信号和终端处理、取消/进度钩子、日志转发、已有文件冲突返回码。生产源码树不在原地打补丁，默认普通构建不启用该适配。
+适配包括：库入口、选项/计数/进度状态复位、禁用应用进程信号和终端处理、取消/进度钩子、日志转发、已有文件冲突返回码。生产源码树不在原地打补丁，命令版启用该适配；显式关闭命令组件时不启用。
 
-主机验证使用与 NAPI 相同的 `native/command.cpp`，在同一个进程里重复调用命令库，覆盖 20 次命令执行、WAV 产物内容、选项状态复位、错误重试、复杂滤镜、取消和超时重试、应用 SIGINT 处理器保留；另用 AddressSanitizer/UndefinedBehaviorSanitizer 检查 C++ 适配层及进程退出泄漏。底层 FFmpeg 动态库未做全量 sanitizer 插桩，这些结果不替代手机测试。可执行 `bash scripts/test-command-host.sh /path/to/ffmpeg-9.0.2` 复现；实验流水线在原媒体测试后执行该项，普通流水线跳过。
+主机验证使用与 NAPI 相同的 `native/command.cpp`，在同一个进程里重复调用命令库，覆盖 20 次命令执行、WAV 产物内容、选项状态复位、错误重试、复杂滤镜、取消和超时重试、应用 SIGINT 处理器保留；另用 AddressSanitizer/UndefinedBehaviorSanitizer 检查 C++ 适配层及进程退出泄漏。底层 FFmpeg 动态库未做全量 sanitizer 插桩，这些结果不替代手机测试。可执行 `bash scripts/test-command-host.sh /path/to/ffmpeg-9.0.2` 复现；实验流水线在原媒体测试后执行该项，仅显式关闭命令组件的手动流水线跳过。
 
 本地实验 HAR 复用了已发布 `v1.0.2-ci.11` 中校验过的 extended 动态库，使用锁定 SDK 为 ARM64、x86_64 重新编译命令组件和 NAPI 桥接。临时 manifest 记录基线与适配哈希。标准实验构建脚本则从锁定源码完整重建，不依赖该复用流程。没有推送或触发远端构建。
 

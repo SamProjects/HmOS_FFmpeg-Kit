@@ -1,7 +1,7 @@
 {
   "modelVersion": "6.0.0",
   "name": "hmos-ffmpeg-workspace",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Zero-patch FFmpeg HAR workspace",
   "dependencies": {},
   "devDependencies": {}

@@ -1,7 +1,7 @@
 {
   "name": "@samprojects/hmos-ffmpeg",
-  "version": "1.0.1",
-  "description": "Official zero-patch FFmpeg shared libraries for HarmonyOS arm64-v8a",
+  "version": "1.0.3",
+  "description": "FFmpeg 9.0.2 extended universal HAR with in-process command execution for HarmonyOS",
   "main": "Index.ets",
   "license": "MIT AND LGPL-3.0-or-later",
   "dependencies": {

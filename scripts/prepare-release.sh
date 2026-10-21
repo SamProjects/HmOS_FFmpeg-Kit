@@ -4,7 +4,6 @@
 set -euo pipefail
 : "${GH_TOKEN:?}" "${GITHUB_REPOSITORY:?}" "${GITHUB_SHA:?}" "${GITHUB_ENV:?}"
 notes=docs/RELEASE-NOTES.md
-if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then notes=docs/COMMAND-TEST.zh-CN.md; fi
 version=$(python3 -c 'import json; print(json.load(open("config/project.json"))["version"])')
 tag="v${version}-ci.${GITHUB_RUN_NUMBER}"
 if [[ "${REF_TYPE:-}" == tag ]]; then tag="$REF_NAME"; fi
