@@ -1,45 +1,123 @@
-name: 校验并恢复已编译的发布
+name: 校验并发布已验证的全架构 HAR
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/recover-release.yml']
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 已有草稿的版本标签
+        required: true
+        type: string
+      source_sha:
+        description: 标签对应的完整源码提交 SHA
+        required: true
+        type: string
+      har_sha256:
+        description: 本地验证通过的完整 HAR SHA-256
+        required: true
+        type: string
+      blob_parts:
+        description: 临时 Git blob 分片清单 JSON（不加入源码提交）
+        required: true
+        type: string
 permissions:
   contents: write
 concurrency:
-  group: recover-release-v1.0.1-ci.10
+  group: recover-${{ inputs.release_tag }}
   cancel-in-progress: false
 jobs:
-  recover:
+  publish:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       GH_TOKEN: ${{ github.token }}
-      RELEASE_TAG: v1.0.1-ci.10
-      SOURCE_SHA: c5a555eaed241db99ceb85abf4d9581124957f85
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      HAR_SHA256: ${{ inputs.har_sha256 }}
+      BLOB_PARTS: ${{ inputs.blob_parts }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: c5a555eaed241db99ceb85abf4d9581124957f85
-      - name: 下载草稿附件并验证原始源码和所有校验和
+          ref: ${{ inputs.source_sha }}
+      - name: 核对草稿、源码标签与版本
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
-          git fetch --no-tags origin "refs/tags/$RELEASE_TAG"
-          test "$(git rev-parse 'FETCH_HEAD^{commit}')" = "$SOURCE_SHA"
-          gh api "repos/$GITHUB_REPOSITORY/releases/418520301" > /tmp/release.json
-          jq -e --arg tag "$RELEASE_TAG" '.tag_name == $tag and .draft == true' /tmp/release.json
-          mkdir -p dist/assets
-          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir dist/assets
-          (cd dist/assets && sha256sum --check SHA256SUMS)
-          GITHUB_SHA="$SOURCE_SHA" python3 scripts/check-release.py dist/assets
-          python3 scripts/check-upload.py dist/assets /tmp/release.json
-      - name: 发布校验通过的预发布版
+          version=$(python3 -c 'import json; print(json.load(open("config/project.json"))["version"])')
+          test "$RELEASE_TAG" = "v$version"
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" > /tmp/tag.json
+          jq -e --arg sha "$SOURCE_SHA" '.object.type == "commit" and .object.sha == $sha' /tmp/tag.json
+          gh release view "$RELEASE_TAG" --json isDraft --jq '.isDraft' | grep -x true
+      - name: 还原 HAR 并校验包版本、双架构及已测试的全部运行库
+        run: |
+          python3 - <<'PY'
+          import base64, hashlib, json, os, re, subprocess, tarfile
+          from pathlib import Path
+          expected = os.environ['HAR_SHA256']
+          assert re.fullmatch(r'[0-9a-f]{64}', expected)
+          parts = json.loads(os.environ['BLOB_PARTS'])
+          assert 1 <= len(parts) <= 32
+          version = json.load(open('config/project.json'))['version']
+          directory = Path('dist/verified-release'); directory.mkdir(parents=True)
+          output = directory / f'hmos-ffmpeg-{version}-extended-all-command-test.har'
+          with output.open('wb') as stream:
+              for part in parts:
+                  sha = part['sha']
+                  assert re.fullmatch(r'[0-9a-f]{40}', sha)
+                  assert 0 < part['bytes'] <= 8_000_000
+                  response = subprocess.check_output(['gh', 'api', f'repos/{os.environ["GITHUB_REPOSITORY"]}/git/blobs/{sha}'])
+                  blob = json.loads(response)
+                  assert blob['sha'] == sha and blob['encoding'] == 'base64'
+                  data = base64.b64decode(blob['content'])
+                  assert len(data) == part['bytes'] == blob['size']
+                  assert hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest() == sha
+                  stream.write(data)
+          assert hashlib.file_digest(output.open('rb'), 'sha256').hexdigest() == expected
+          evidence = json.load(open('experiments/command-execution/expanded-build-validation.json'))
+          libraries = {}
+          for abi, record in evidence['abis'].items():
+              assert record['codecGate']['passed']
+              assert all(record['validation'][g] for g in ['sourceIntegrity', 'licenseConfig', 'elfClosure'])
+              assert len(record['runtimeSha256']) == 10
+              libraries.update({f'libs/{abi}/{name}': sha for name, sha in record['runtimeSha256'].items()})
+          assert len(libraries) == 20
+          with tarfile.open(output) as archive:
+              members = {}
+              for member in archive.getmembers():
+                  name = member.name.removeprefix('./').removeprefix('package/')
+                  assert name not in members, 'Duplicate HAR member'
+                  members[name] = member
+              actual = {name for name in members if name.startswith('libs/') and name.endswith('.so')}
+              assert actual == set(libraries)
+              for name, sha in libraries.items():
+                  assert hashlib.sha256(archive.extractfile(members[name]).read()).hexdigest() == sha, name
+              package = json.load(archive.extractfile(members['oh-package.json5']))
+              assert package['name'] == '@samprojects/hmos-ffmpeg' and package['version'] == version
+              assert package['license'] == 'MIT AND LGPL-3.0-or-later'
+              assert 'Index.ets' in members
+              assert any(name.startswith('licenses/command-test/') for name in members)
+          print('完整 HAR 哈希、版本、双架构及 20 个已测试动态库均核对通过')
+          PY
+      - name: 上传到已有草稿并核对远端 SHA-256 后公开
         run: |
           set -euo pipefail
-          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/418520301" \
-            -F draft=false -F prerelease=true \
-            -f name="鸿蒙 FFmpeg $RELEASE_TAG（预发布版）" \
-            -f body="$(cat docs/RELEASE-NOTES.md)" > /tmp/published.json
-          jq -e --arg tag "$RELEASE_TAG" '.tag_name == $tag and .draft == false and (.assets | length) == 41' /tmp/published.json
-          jq -r .html_url /tmp/published.json
+          # A completed release is immutable; never overwrite it.
+          gh release view "$RELEASE_TAG" --json isDraft --jq '.isDraft' | grep -x true
+          gh release upload "$RELEASE_TAG" dist/verified-release/*.har --clobber
+          release_id=$(gh release view "$RELEASE_TAG" --json databaseId --jq '.databaseId')
+          gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" > /tmp/release.json
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          release = json.load(open('/tmp/release.json'))
+          local = list(Path('dist/verified-release').iterdir())
+          assert release['draft'] and release['tag_name'] == os.environ['RELEASE_TAG']
+          assert len(local) == len(release['assets']) == 1
+          path = local[0]; asset = release['assets'][0]
+          assert asset['name'] == path.name and asset['state'] == 'uploaded'
+          assert asset['size'] == path.stat().st_size
+          assert asset['digest'] == 'sha256:' + hashlib.file_digest(path.open('rb'), 'sha256').hexdigest()
+          print('远端唯一附件的名称、大小和 SHA-256 均核对通过')
+          PY
+          gh release edit "$RELEASE_TAG" --draft=false --prerelease \
+            --title "鸿蒙 FFmpeg $RELEASE_TAG（命令执行与扩展编解码预发布版）" \
+            --notes-file docs/RELEASE-NOTES.md
+          gh release view "$RELEASE_TAG" --json url --jq '.url'
