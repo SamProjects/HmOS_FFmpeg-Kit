@@ -1,0 +1,71 @@
+{
+  "artifact": "hmos-ffmpeg-1.0.2-extended-all-command-test.har",
+  "sha256": "59e2084012ce5c81f467186e23a1a35d7d127597940c79242f4fb68fc9482470",
+  "bytes": 30137917,
+  "experimental": true,
+  "targetMinimumApi": 12,
+  "harmonyDeviceTested": false,
+  "nativeLibraryCountPerAbi": 10,
+  "reusedRuntimeRelease": "v1.0.2-ci.11",
+  "sdk": {
+    "apiVersion": "26",
+    "displayName": "Native",
+    "meta": {
+      "metaVersion": "3.0.2"
+    },
+    "path": "native",
+    "platformVersion": "26.0.0",
+    "releaseType": "Release",
+    "version": "26.0.0.105"
+  },
+  "consumerValidation": {
+    "harSha256": "59e2084012ce5c81f467186e23a1a35d7d127597940c79242f4fb68fc9482470",
+    "consumerHapBuilt": true,
+    "deviceRun": false,
+    "cloudDistributionTested": false,
+    "selections": [
+      {
+        "selectedAbis": [
+          "arm64-v8a"
+        ],
+        "packagedAbis": [
+          "arm64-v8a"
+        ],
+        "hapBytes": 31631460,
+        "nativeBytes": {
+          "arm64-v8a": 30095648
+        },
+        "libraryCount": 10
+      },
+      {
+        "selectedAbis": [
+          "x86_64"
+        ],
+        "packagedAbis": [
+          "x86_64"
+        ],
+        "hapBytes": 38964352,
+        "nativeBytes": {
+          "x86_64": 37428600
+        },
+        "libraryCount": 10
+      },
+      {
+        "selectedAbis": [
+          "arm64-v8a",
+          "x86_64"
+        ],
+        "packagedAbis": [
+          "arm64-v8a",
+          "x86_64"
+        ],
+        "hapBytes": 69061394,
+        "nativeBytes": {
+          "arm64-v8a": 30095648,
+          "x86_64": 37428600
+        },
+        "libraryCount": 20
+      }
+    ]
+  }
+}

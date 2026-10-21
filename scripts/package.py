@@ -16,6 +16,8 @@ runtime.mkdir(parents=True)
 for lib in (prefix / 'lib').glob('lib*-*.so'):
     shutil.copy2(lib, runtime / lib.name)
 shutil.copy2(build / 'bridge/libhmosffmpeg.so', runtime / 'libhmosffmpeg.so')
+if COMMAND_TEST:
+    shutil.copy2(prefix / 'lib/libhmosffmpegcmd.so', runtime / 'libhmosffmpegcmd.so')
 shutil.copy2(sdk / 'llvm/lib' / TRIPLE / 'libc++_shared.so', runtime / 'libc++_shared.so')
 # SDK runtime is kept verbatim. Library build IDs/symbols are never manufactured.
 symbols = package / 'symbols' / ABI
@@ -62,6 +64,15 @@ for name, source in SOURCES.items():
 for p in [sdk / 'NOTICE.txt', sdk / 'llvm/NOTICE.txt', sdk / 'llvm/LICENSE.TXT']:
     if p.is_file(): shutil.copy2(p, licenses / ('sdk-' + p.parent.name + '-' + p.name))
 shutil.copy2(ROOT / 'LICENSE', licenses / 'project-MIT.txt')
+if COMMAND_TEST:
+    adapter = licenses / 'command-test'
+    adapter.mkdir()
+    source = WORK / 'command-src' / key
+    for name in ['hmos-command.patch', 'hmos-command-adaptation.json']:
+        shutil.copy2(source / name, adapter / name)
+    shutil.copytree(ROOT / 'native/command', adapter / 'recipe')
+    shutil.copy2(ROOT / 'scripts/prepare-command-source.py', adapter / 'prepare-command-source.py')
+
 if not HAR_ONLY:
     shutil.copytree(licenses, har / 'licenses')
     shutil.copytree(licenses, har / 'src/main/resources/rawfile/hmos_ffmpeg_licenses')
@@ -88,7 +99,8 @@ write_json(package / 'manifest.json', {
     'project': PROJECT, 'profile': profile, 'abi': ABI, 'commit': os.environ.get('GITHUB_SHA', 'local'),
     'validation': {'sourceIntegrity': True, 'licenseConfig': True, 'elfClosure': True, 'device': False, 'appRuntime': False},
     'libraries': {p.name: digest(p) for p in runtime.glob('*.so')}, 'sources': SOURCES,
-    'naming': 'GNU make command-line overrides; no source or ELF patching'})
+    'commandExperimental': COMMAND_TEST,
+    'naming': 'Recorded experimental fftools adapter; pristine libav sources' if COMMAND_TEST else 'GNU make command-line overrides; no source or ELF patching'})
 if not HAR_ONLY:
     write_json(package / 'sbom.spdx.json', {
         'spdxVersion':'SPDX-2.3','dataLicense':'CC0-1.0','SPDXID':'SPDXRef-DOCUMENT',

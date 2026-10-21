@@ -32,19 +32,45 @@ napi_value capabilities(napi_env env, napi_callback_info) {
 napi_value start(napi_env env, napi_callback_info info) {
     auto w = std::make_unique<Work>(); bool inserted = false;
     try {
-        napi_value argv[9]; size_t argc = 9; ok(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
-        if(argc != 9) throw std::runtime_error("Expected id, operation, input, output, videoCodec, audioCodec, videoFilter, audioFilter, caFile");
-        int32_t id; ok(napi_get_value_int32(env, argv[0], &id));
+        napi_value argv[9]; size_t argc = 9; void* mode = nullptr; ok(napi_get_cb_info(env, info, &argc, argv, nullptr, &mode));
         auto task = std::make_shared<Task>();
-        task->operation = string(env, argv[1]); task->input = string(env, argv[2]); task->output = string(env, argv[3]);
-        task->videoCodec = string(env, argv[4]); task->audioCodec = string(env, argv[5]);
-        task->videoFilter = string(env, argv[6]); task->audioFilter = string(env, argv[7]); task->caFile = string(env, argv[8]);
-        if(task->operation != "probe" && task->operation != "remux" && task->operation != "transcode") throw std::runtime_error("Unsupported operation");
-        if(task->input.empty()) throw std::runtime_error("Input required");
-        if((task->videoCodec.empty() || task->videoCodec == "copy") && !task->videoFilter.empty()) throw std::runtime_error("Video filter requires encoder");
-        if((task->audioCodec.empty() || task->audioCodec == "copy") && !task->audioFilter.empty()) throw std::runtime_error("Audio filter requires encoder");
+        int32_t id;
+        if(mode) {
+            if(argc != 3) throw std::runtime_error("Expected id, argument array and timeout seconds");
+            ok(napi_get_value_int32(env, argv[0], &id));
+            bool array = false; ok(napi_is_array(env, argv[1], &array));
+            if(!array) throw std::runtime_error("Command arguments must be an array");
+            uint32_t length; ok(napi_get_array_length(env, argv[1], &length));
+            if(length == 0 || length > 256) throw std::runtime_error("Expected 1 to 256 command arguments");
+            size_t total = 0;
+            for(uint32_t i = 0; i < length; ++i) {
+                napi_value item; ok(napi_get_element(env, argv[1], i, &item));
+                task->commandArguments.push_back(string(env, item));
+                total += task->commandArguments.back().size();
+                if(total > 1024 * 1024) throw std::runtime_error("Command too large");
+            }
+            ok(napi_get_value_int32(env, argv[2], &task->timeoutSeconds));
+            if(task->timeoutSeconds < 1 || task->timeoutSeconds > 3600) throw std::runtime_error("Timeout must be 1 to 3600 seconds");
+            task->operation = "command";
+#ifndef HMOS_COMMAND_TEST
+            throw std::runtime_error("This HAR was built without the experimental command engine");
+#endif
+        } else {
+            if(argc != 9) throw std::runtime_error("Expected nine operation arguments");
+            ok(napi_get_value_int32(env, argv[0], &id));
+            task->operation = string(env, argv[1]); task->input = string(env, argv[2]); task->output = string(env, argv[3]);
+            task->videoCodec = string(env, argv[4]); task->audioCodec = string(env, argv[5]);
+            task->videoFilter = string(env, argv[6]); task->audioFilter = string(env, argv[7]); task->caFile = string(env, argv[8]);
+            if(task->operation != "probe" && task->operation != "remux" && task->operation != "transcode") throw std::runtime_error("Unsupported operation");
+            if(task->input.empty()) throw std::runtime_error("Input required");
+            if((task->videoCodec.empty() || task->videoCodec == "copy") && !task->videoFilter.empty()) throw std::runtime_error("Video filter requires encoder");
+            if((task->audioCodec.empty() || task->audioCodec == "copy") && !task->audioFilter.empty()) throw std::runtime_error("Audio filter requires encoder");
+        }
         w->key = {env, id}; w->task = task;
         { std::lock_guard<std::mutex> lock(guard);
+          for(const auto& entry : tasks)
+              if(task->operation == "command" || entry.second->operation == "command")
+                  throw std::runtime_error("Command tests require exclusive access; wait for active tasks");
           if(tasks.size() >= 4 || tasks.count(w->key)) throw std::runtime_error("Too many tasks or duplicate session id");
           tasks.emplace(w->key, task); inserted = true; }
         napi_value promise; ok(napi_create_promise(env, &w->deferred, &promise));
@@ -52,7 +78,8 @@ napi_value start(napi_env env, napi_callback_info info) {
             [](napi_env, void* data) {
                 auto* w = static_cast<Work*>(data);
                 try {
-                    if(w->task->operation == "probe") w->result = hmosffmpeg::probe(*w->task);
+                    if(w->task->operation == "command") w->result = hmosffmpeg::executeCommand(*w->task);
+                    else if(w->task->operation == "probe") w->result = hmosffmpeg::probe(*w->task);
                     else { hmosffmpeg::convert(*w->task); w->result = "{}"; }
                 } catch(const std::exception& e) { w->error = e.what(); }
             },
@@ -90,6 +117,7 @@ napi_value init(napi_env env, napi_value exports) {
         {"getBuildInfo", nullptr, buildInfo, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"getCapabilities", nullptr, capabilities, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"run", nullptr, start, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"execute", nullptr, start, nullptr, nullptr, nullptr, napi_default, reinterpret_cast<void*>(1)},
         {"control", nullptr, control, nullptr, nullptr, nullptr, napi_default, nullptr}
     };
     napi_define_properties(env, exports, sizeof(properties)/sizeof(properties[0]), properties);

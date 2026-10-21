@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 : "${GH_TOKEN:?}" "${GITHUB_REPOSITORY:?}" "${RELEASE_TAG:?}"
+notes=docs/RELEASE-NOTES.md
+label='预发布版'
+if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then
+  notes=docs/COMMAND-TEST.zh-CN.md
+  label='命令执行实验版'
+fi
 # Verify the actual tag commit; target_commitish metadata is not authoritative
 # when the release was created for a tag that already existed.
 git fetch --no-tags origin "refs/tags/$RELEASE_TAG"
@@ -30,8 +36,8 @@ gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" > "$remote"
 python3 scripts/check-upload.py dist/assets "$remote"
 for attempt in 1 2 3; do
   if gh release edit "$RELEASE_TAG" --draft=false --prerelease \
-    --title "鸿蒙 FFmpeg $RELEASE_TAG（预发布版）" \
-    --notes-file docs/RELEASE-NOTES.md --repo "$GITHUB_REPOSITORY"; then
+    --title "鸿蒙 FFmpeg $RELEASE_TAG（$label）" \
+    --notes-file "$notes" --repo "$GITHUB_REPOSITORY"; then
     echo '所有发布文件已核对并公开，标题和说明均为中文。'; exit 0
   fi
   if [[ "$attempt" != 3 ]]; then sleep 10; fi

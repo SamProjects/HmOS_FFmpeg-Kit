@@ -12,6 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 WORK = ROOT / 'work'
 DIST = ROOT / 'dist'
 HAR_ONLY = os.environ.get('HMOS_HAR_ONLY') == '1'
+COMMAND_TEST = os.environ.get('HMOS_COMMAND_TEST') == '1'
+RUNTIME_LIBRARY_COUNT = 10 if COMMAND_TEST else 9
+HAR_SUFFIX = '-command-test' if COMMAND_TEST else ''
 PROJECT = json.loads((ROOT / 'config/project.json').read_text())
 SOURCES = json.loads((ROOT / 'config/sources.lock.json').read_text())
 ABI = os.environ.get('HMOS_ABI', PROJECT['abi'])

@@ -1,6 +1,6 @@
 import native from 'libhmosffmpeg.so';
 
-export interface BuildInfo { version: string; license: string; configuration: string; hardwareBackend: string; }
+export interface BuildInfo { version: string; license: string; configuration: string; hardwareBackend: string; commandExecution: string; }
 export interface Capabilities {
   encoders: string[]; decoders: string[]; filters: string[];
   muxers: string[]; demuxers: string[]; inputProtocols: string[]; outputProtocols: string[];
@@ -16,6 +16,8 @@ export interface TranscodeOptions {
   audioFilter?: string;
   caFile?: string;
 }
+export interface CommandResult { exitCode: number; cancelled: boolean; timedOut: boolean; logs: string; logsTruncated: boolean; }
+export interface CommandSession { id: number; result: Promise<CommandResult>; }
 export interface Session { id: number; result: Promise<void>; }
 
 export class FFmpeg {
@@ -36,6 +38,14 @@ export class FFmpeg {
     const result = native.run(id, 'transcode', options.input, options.output,
       options.videoCodec ?? 'mpeg4', options.audioCodec ?? 'aac',
       options.videoFilter ?? '', options.audioFilter ?? '', options.caFile ?? '').then((): void => {});
+    return { id, result };
+  }
+  // Experimental command-test HAR only. Arguments exclude the executable name.
+  static execute(args: string[], timeoutSeconds: number = 300): CommandSession {
+    const id = ++FFmpeg.sequence;
+    const result = native.execute(id, args, timeoutSeconds).then((value: string): CommandResult => {
+      return JSON.parse(value) as CommandResult;
+    });
     return { id, result };
   }
   static cancel(id: number): void { native.control(id, true); }

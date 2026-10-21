@@ -14,7 +14,7 @@ def check_asset(directory, name):
 
 def validate_har_only(directory):
     directory = Path(directory)
-    base = f'hmos-ffmpeg-{PROJECT["version"]}-extended-all'
+    base = f'hmos-ffmpeg-{PROJECT["version"]}-extended-all' + HAR_SUFFIX
     har = directory / (base + '.har')
     if set(directory.iterdir()) != {har} or not har.is_file() or har.stat().st_size == 0:
         raise ValueError('Expected only the extended universal HAR')
@@ -25,7 +25,7 @@ def validate_har_only(directory):
     if len(report['selections']) != len(expected) or {tuple(r['selectedAbis']) for r in report['selections']} != expected:
         raise ValueError('Incomplete universal consumer matrix')
     for r in report['selections']:
-        if r['packagedAbis'] != sorted(r['selectedAbis']) or r['libraryCount'] != 9 * len(r['selectedAbis']):
+        if r['packagedAbis'] != sorted(r['selectedAbis']) or r['libraryCount'] != RUNTIME_LIBRARY_COUNT * len(r['selectedAbis']):
             raise ValueError('Consumer contains wrong architecture/library count')
     libraries = {}
     for abi in PROJECT['abis']:
@@ -34,7 +34,9 @@ def validate_har_only(directory):
             raise ValueError('Wrong profile/version/ABI')
         if os.environ.get('GITHUB_SHA') and manifest['commit'] != os.environ['GITHUB_SHA']:
             raise ValueError('Artifact commit mismatch')
-        if len(manifest['libraries']) != 9 or not all(manifest['validation'][g] for g in ['sourceIntegrity', 'licenseConfig', 'elfClosure']):
+        if COMMAND_TEST and not manifest.get('commandExperimental'):
+            raise ValueError('Missing command-test provenance')
+        if len(manifest['libraries']) != RUNTIME_LIBRARY_COUNT or not all(manifest['validation'][g] for g in ['sourceIntegrity', 'licenseConfig', 'elfClosure']):
             raise ValueError('Build gates did not pass')
         libraries.update({f'libs/{abi}/{name}':sha for name,sha in manifest['libraries'].items()})
     with tarfile.open(har) as t:
@@ -77,7 +79,7 @@ def validate(directory):
         if {tuple(r['selectedAbis']) for r in report['selections']} != expected:
             raise ValueError('Incomplete universal consumer matrix')
         for r in report['selections']:
-            if r['packagedAbis'] != sorted(r['selectedAbis']) or r['libraryCount'] != 9 * len(r['selectedAbis']):
+            if r['packagedAbis'] != sorted(r['selectedAbis']) or r['libraryCount'] != RUNTIME_LIBRARY_COUNT * len(r['selectedAbis']):
                 raise ValueError('Consumer contains wrong architecture/library count')
     print('All single-ABI and universal HAR packages, consumers and exact sources verified')
 

@@ -3,6 +3,8 @@
 # release tag for a stale workflow revision after main's workflows change.
 set -euo pipefail
 : "${GH_TOKEN:?}" "${GITHUB_REPOSITORY:?}" "${GITHUB_SHA:?}" "${GITHUB_ENV:?}"
+notes=docs/RELEASE-NOTES.md
+if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then notes=docs/COMMAND-TEST.zh-CN.md; fi
 version=$(python3 -c 'import json; print(json.load(open("config/project.json"))["version"])')
 tag="v${version}-ci.${GITHUB_RUN_NUMBER}"
 if [[ "${REF_TYPE:-}" == tag ]]; then tag="$REF_NAME"; fi
@@ -33,7 +35,7 @@ else
   grep -qiE 'not found|HTTP 404' "$tmp/error" || { cat "$tmp/error"; exit 1; }
   gh release create "$tag" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
     --target "$GITHUB_SHA" --prerelease --title "鸿蒙 FFmpeg $tag（构建中草稿）" \
-    --notes-file docs/RELEASE-NOTES.md
+    --notes-file "$notes"
 fi
 echo "RELEASE_TAG=$tag" >> "$GITHUB_ENV"
 echo "发布权限已检查，标签已固定到本次构建源码：$tag $GITHUB_SHA"

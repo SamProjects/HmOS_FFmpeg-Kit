@@ -6,6 +6,8 @@
 
 实施入口：实际可执行配方以仓库 `scripts/`、`config/` 和工作流为准，本文代码块用于解释基线。当前实现使用外置 GNU make 参数生成 `libavcodec-63.so` 等库名，不修改源码或 ELF；依赖安装到独立绝对 prefix，清空 `PKG_CONFIG_SYSROOT_DIR`，避免重复 staging 路径。对应 HAR 使用方法见 `INTEGRATION.zh-CN.md`。按用户要求，CI 不保存 Actions Artifacts，也不使用持久缓存；候选成品直接发布到标明验证边界的 Release 预发布版。
 
+2026-10-21 用户授权的实验例外：`HMOS_COMMAND_TEST=1` 的命令执行测试版允许在隔离复制树中适配 fftools，记录完整差异并以独立动态库交付，不宣称命令组件零补丁；默认普通构建仍遵守原约束。实施和测试范围见 [命令测试版说明](COMMAND-TEST.zh-CN.md)。
+
 ## 1. 目标与不可突破的边界
 
 使用 FFmpeg 官方最新稳定发布源码，Zero-Patch，通过 HarmonyOS Native SDK 内的 clang 交叉编译出 arm64-v8a 共享库。构建采用 LGPLv3-or-later 口径，禁止 GPL、nonfree 组件；在平台能力和许可允许的范围内尽可能保留编解码、封装、滤镜、协议和探测功能。

@@ -7,6 +7,10 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
+      command_test:
+        description: 构建带 execute 参数接口的命令执行实验版（未经真机验证）
+        type: boolean
+        default: false
       publish:
         description: Publish a prerelease after all checks pass
         type: boolean
@@ -34,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - run: python3 -m unittest discover -s tests -v
-      - run: bash -n scripts/build-ohos.sh scripts/build-deps.sh scripts/test-native.sh scripts/cleanup-actions-storage.sh scripts/install-ci-deps.sh scripts/prepare-release.sh scripts/publish-release.sh
+      - run: bash -n scripts/build-ohos.sh scripts/build-deps.sh scripts/test-native.sh scripts/cleanup-actions-storage.sh scripts/install-ci-deps.sh scripts/prepare-release.sh scripts/publish-release.sh scripts/test-command-host.sh
   media-test:
     needs: verify
     runs-on: ubuntu-24.04
@@ -44,12 +48,16 @@ jobs:
       - run: bash scripts/install-ci-deps.sh media
       - name: Exercise media pipeline with sanitizers and timing checks
         run: bash scripts/test-native.sh
+      - name: 验证实验命令引擎的连续调用、错误、取消与超时
+        if: github.event_name == 'workflow_dispatch' && inputs.command_test
+        run: bash scripts/test-command-host.sh
   build-release:
     needs: [verify, media-test]
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       HMOS_HAR_ONLY: "1"
+      HMOS_COMMAND_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.command_test && '1' || '0' }}
     permissions:
       contents: write
     steps:

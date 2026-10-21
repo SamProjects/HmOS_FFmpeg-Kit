@@ -178,8 +178,13 @@ void decode(Stream& s, AVFormatContext* output, AVPacket* p) {
 }
 
 std::string buildInfo() {
+#ifdef HMOS_COMMAND_TEST
+    const std::string command = "experimental-serial";
+#else
+    const std::string command = "disabled";
+#endif
     return "{\"version\":" + quote(av_version_info()) + ",\"license\":" + quote(avutil_license())
-        + ",\"configuration\":" + quote(avutil_configuration()) + ",\"hardwareBackend\":\"external-harmony-avcodec\"}";
+        + ",\"commandExecution\":" + quote(command) + ",\"configuration\":" + quote(avutil_configuration()) + ",\"hardwareBackend\":\"external-harmony-avcodec\"}";
 }
 std::string capabilities() {
     std::string result = "{\"encoders\":["; bool first = true; void* it = nullptr;

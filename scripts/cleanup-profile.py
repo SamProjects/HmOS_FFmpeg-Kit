@@ -12,7 +12,7 @@ base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-{ABI}'
 if HAR_ONLY:
     manifest = json.loads((DIST / key / 'manifest.json').read_text())
     libraries = {p.name: digest(p) for p in (DIST / key / 'runtime' / ABI).glob('*.so')}
-    if len(libraries) != 9 or libraries != manifest['libraries'] or not all(
+    if len(libraries) != RUNTIME_LIBRARY_COUNT or libraries != manifest['libraries'] or not all(
             manifest['validation'][g] for g in ['sourceIntegrity', 'licenseConfig', 'elfClosure']):
         raise ValueError('Refusing cleanup before runtime validation')
 else:
@@ -20,7 +20,7 @@ else:
         asset = DIST / 'assets' / (base + suffix)
         if not asset.is_file() or (asset.parent / (asset.name + '.sha256')).read_text().split() != [digest(asset), asset.name]:
             raise ValueError('Refusing cleanup before validated asset exists: ' + asset.name)
-for category in ['build', 'prefix', 'har', 'consumer']:
+for category in ['build', 'prefix', 'har', 'consumer', 'command-src']:
     parent = (WORK / category).resolve()
     target = parent / key
     if target.resolve().parent != parent or not parent.is_relative_to(WORK.resolve()):

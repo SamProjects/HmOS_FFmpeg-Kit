@@ -27,7 +27,7 @@ run(['hvigorw', '--mode', 'module', '-p', 'product=default', '-p', 'module=ffmpe
 candidates = list((directory / 'ffmpeg/build/default/outputs').rglob('*.har'))
 if len(candidates) != 1:
     raise SystemExit(f'Expected one HAR, got {candidates}')
-base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-' + ('all' if universal else ABI)
+base = f'hmos-ffmpeg-{PROJECT["version"]}-{profile}-' + ('all' if universal else ABI) + HAR_SUFFIX
 output = package / (base + '.har')
 shutil.copy2(candidates[0], output)
 expected = {abi: {p.name:digest(p) for p in (DIST / profile_key(profile, abi) / 'runtime' / abi).glob('*.so')}
@@ -35,7 +35,7 @@ expected = {abi: {p.name:digest(p) for p in (DIST / profile_key(profile, abi) / 
 with tarfile.open(output) as t:
     members = {m.name.removeprefix('./').removeprefix('package/'):m for m in t.getmembers()}
     for abi, libraries in expected.items():
-        if len(libraries) != 9:
+        if len(libraries) != RUNTIME_LIBRARY_COUNT:
             raise ValueError('Expected FFmpeg, bridge and C++ runtime closure: ' + abi)
         for name, sha in libraries.items():
             member = members.get(f'libs/{abi}/{name}')

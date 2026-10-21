@@ -5,6 +5,9 @@ ROOT="$PWD"
 PROFILE="${1:-extended}"
 [[ "$PROFILE" == core || "$PROFILE" == extended ]] || exit 2
 : "${OHOS_NATIVE:?Set native SDK directory}"
+if [[ "${HMOS_COMMAND_TEST:-0}" == 1 && ( "$PROFILE" != extended || "${HMOS_HAR_ONLY:-0}" != 1 ) ]]; then
+  echo 'Command test requires extended and HMOS_HAR_ONLY=1'; exit 2
+fi
 export LC_ALL=C TZ=UTC
 export SOURCE_DATE_EPOCH="$(python3 -c 'import json; print(json.load(open("config/project.json"))["sourceDateEpoch"])')"
 python3 scripts/fetch-sources.py
@@ -47,6 +50,11 @@ if [[ "$PROFILE" == extended ]]; then
   echo "第三方依赖编译完成：$PROFILE $ABI（失败时输出日志摘要）"
   extra+=(--enable-libopus --enable-libvpx --enable-libmp3lame --enable-zlib --enable-mbedtls)
 fi
+SOURCE="$ROOT/work/src/ffmpeg"
+if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then
+  SOURCE="$ROOT/work/command-src/$KEY"
+  python3 scripts/prepare-command-source.py "$ROOT/work/src/ffmpeg" "$SOURCE"
+fi
 mkdir "$BUILD/ffmpeg"
 cd "$BUILD/ffmpeg"
 args=("--prefix=$PREFIX" --target-os=linux "--arch=$ARCH" "--cpu=$CPU"
@@ -62,27 +70,38 @@ args=("--prefix=$PREFIX" --target-os=linux "--arch=$ARCH" "--cpu=$CPU"
   "--extra-cflags=-O2 -g -fPIC -march=$MARCH -I$PREFIX/include"
   "--extra-ldflags=-fuse-ld=lld -L$PREFIX/lib -Wl,-z,relro,-z,now,--build-id=sha1"
   --extra-ldexeflags=-pie "${extra[@]}")
-if [[ "${HMOS_HAR_ONLY:-0}" == 1 ]]; then
+if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then
+  args+=(--enable-ffmpeg --disable-ffprobe)
+elif [[ "${HMOS_HAR_ONLY:-0}" == 1 ]]; then
   args+=(--disable-programs)
 else
   args+=(--enable-ffmpeg --enable-ffprobe)
 fi
 printf '%s\n' "${args[@]}" > configure-args.txt
-if ! bash "$ROOT/work/src/ffmpeg/configure" "${args[@]}" > configure.log 2>&1; then
+if ! bash "$SOURCE/configure" "${args[@]}" > configure.log 2>&1; then
   tail -n 120 configure.log; exit 1
 fi
-# GNU make command-line overrides only: no source/config/ELF patching.
+# Library naming uses make overrides. Command-test fftools adaptations are recorded separately.
 # Distinct versioned basename ending .so works with HAR native packaging.
 names=('SLIBNAME_WITH_MAJOR=$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
        'SLIBNAME_WITH_VERSION=$(SLIBNAME_WITH_MAJOR)'
        'SLIB_INSTALL_NAME=$(SLIBNAME_WITH_MAJOR)'
        'SLIB_INSTALL_LINKS=$(SLIBNAME)')
 echo "开始 FFmpeg 编译：$PROFILE $ABI（完整命令写入临时 build.log）"
-if ! make -j"${JOBS:-4}" V=1 "${names[@]}" > build.log 2>&1; then
+build_args=(V=1 "${names[@]}")
+install_args=(install "${names[@]}")
+if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then
+  build_args+=(-f Makefile -f "$ROOT/native/command/command.mak" "HMOS_COMMAND_DIR=$ROOT/native/command" libhmosffmpegcmd.so)
+  install_args=(install-libs install-headers "${names[@]}")
+fi
+if ! make -j"${JOBS:-4}" "${build_args[@]}" > build.log 2>&1; then
   tail -n 120 build.log; exit 1
 fi
-if ! make install "${names[@]}" > install.log 2>&1; then
+if ! make "${install_args[@]}" > install.log 2>&1; then
   tail -n 120 install.log; exit 1
+fi
+if [[ "${HMOS_COMMAND_TEST:-0}" == 1 ]]; then
+  cp libhmosffmpegcmd.so "$PREFIX/lib/"
 fi
 echo "FFmpeg 编译与安装完成：$PROFILE $ABI"
 cd "$ROOT"

@@ -1,0 +1,169 @@
+{
+  "scope": "Linux in-process C++ adapter, not HarmonyOS device execution",
+  "harmonyDeviceTested": false,
+  "commands": [
+    {
+      "name": "version",
+      "progressUs": 0,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 773
+    },
+    {
+      "name": "invalid",
+      "progressUs": 0,
+      "exitCode": -1414549496,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 887
+    },
+    {
+      "name": "version-after-error",
+      "progressUs": 0,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 773
+    },
+    {
+      "name": "generate",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1497
+    },
+    {
+      "name": "repeat-0",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1484
+    },
+    {
+      "name": "repeat-1",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1484
+    },
+    {
+      "name": "repeat-2",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1484
+    },
+    {
+      "name": "repeat-3",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1484
+    },
+    {
+      "name": "repeat-4",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1483
+    },
+    {
+      "name": "repeat-5",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1484
+    },
+    {
+      "name": "repeat-6",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1484
+    },
+    {
+      "name": "repeat-7",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1484
+    },
+    {
+      "name": "repeat-8",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1484
+    },
+    {
+      "name": "repeat-9",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1484
+    },
+    {
+      "name": "overwrite-reset",
+      "progressUs": 0,
+      "exitCode": -17,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1212
+    },
+    {
+      "name": "complex-filter",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1600
+    },
+    {
+      "name": "cancel",
+      "progressUs": 1085333,
+      "exitCode": 255,
+      "cancelled": true,
+      "timedOut": false,
+      "logBytes": 1670
+    },
+    {
+      "name": "after-cancel",
+      "progressUs": 200000,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 1490
+    },
+    {
+      "name": "timeout",
+      "progressUs": 1570667,
+      "exitCode": 255,
+      "cancelled": false,
+      "timedOut": true,
+      "logBytes": 1575
+    },
+    {
+      "name": "after-timeout",
+      "progressUs": 0,
+      "exitCode": 0,
+      "cancelled": false,
+      "timedOut": false,
+      "logBytes": 773
+    }
+  ],
+  "outputAudioVerified": true,
+  "processWideOptionsRejected": true,
+  "applicationSignalHandlerPreserved": true
+}
