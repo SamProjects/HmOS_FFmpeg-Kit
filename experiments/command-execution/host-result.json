@@ -1,0 +1,35 @@
+{
+  "scope": "Linux host processes only; not HarmonyOS runtime validation",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "version": "ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers",
+  "harmonyDeviceTested": false,
+  "harCommandEntryTested": false,
+  "checks": [
+    {
+      "name": "pinned-version",
+      "passed": true,
+      "version": "ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    {
+      "name": "command-parser-and-filename-with-spaces",
+      "passed": true
+    },
+    {
+      "name": "remux-probe-and-progress",
+      "passed": true
+    },
+    {
+      "name": "invalid-command-does-not-terminate-parent",
+      "passed": true
+    },
+    {
+      "name": "sequential-independent-command-processes",
+      "passed": true
+    },
+    {
+      "name": "interrupt-and-reap-child",
+      "passed": true,
+      "exitCode": 255
+    }
+  ]
+}
