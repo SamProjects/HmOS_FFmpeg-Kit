@@ -4,7 +4,7 @@
 
 保持 upstream 源码 Zero-Patch；`--enable-version3 --disable-gpl --disable-nonfree`。ArkTS/NAPI 桥接通过公开 libav API 工作，不修改 fftools，不向 FFmpeg 注册 OHOS codec。硬件编解码由应用自己的 HarmonyOS AVCodec Engine 提供，本仓库不宣称已实现该硬件后端。
 
-需要执行 FFmpeg 参数命令时，可显式构建 [命令执行实验版](docs/COMMAND-TEST.zh-CN.md)。该版本新增 `FFmpeg.execute(args)`，命令组件使用已记录差异的 fftools 适配，属于上述零补丁约束的实验例外；当前尚未完成鸿蒙手机运行验证。
+需要执行 FFmpeg 参数命令时，可显式构建 [命令执行实验版](docs/COMMAND-TEST.zh-CN.md)。该版本新增 `FFmpeg.execute(args)`，命令组件使用已记录差异的 fftools 适配，属于上述零补丁约束的实验例外；当前尚未完成鸿蒙手机运行验证。 可使用 [测试 App](docs/TEST-APP.zh-CN.md) 在 DevEco 本地模拟器执行一键自检。
 
 ## 下载与使用
 

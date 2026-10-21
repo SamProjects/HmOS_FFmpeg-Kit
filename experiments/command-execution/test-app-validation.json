@@ -1,0 +1,26 @@
+{
+  "hap": "ffmpeg-command-test-emulator-unsigned.hap",
+  "sha256": "2a69d29ba18c2a2c5f14b2f51b5bd09cab51dee07430d4d50c8ef6057e9ca547",
+  "harSha256": "59e2084012ce5c81f467186e23a1a35d7d127597940c79242f4fb68fc9482470",
+  "bundleName": "com.samprojects.ffmpegsmoke",
+  "signed": false,
+  "target": "DevEco local emulator permitting unsigned development HAPs",
+  "installedOrExecuted": false,
+  "nativeLibrariesMatchHar": true,
+  "validation": {
+    "selectedAbis": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "packagedAbis": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "hapBytes": 69074395,
+    "nativeBytes": {
+      "arm64-v8a": 30095648,
+      "x86_64": 37428600
+    },
+    "libraryCount": 20
+  }
+}
